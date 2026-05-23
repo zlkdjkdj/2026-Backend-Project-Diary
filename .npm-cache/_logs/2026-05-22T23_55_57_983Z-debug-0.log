@@ -1,0 +1,41 @@
+0 verbose cli /usr/local/bin/node /usr/local/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.6.2
+2 info using node@v24.12.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/kil07201/.npmrc
+5 silly config load:file:/usr/local/etc/npmrc
+6 verbose title npm exec create-vite@latest my-memory-frontend --template react-ts
+7 verbose argv "exec" "--cache" ".npm-cache" "--yes" "--" "create-vite@latest" "my-memory-frontend" "--template" "react-ts"
+8 verbose logfile logs-max:10 dir:/Users/kil07201/.gemini/antigravity-ide/scratch/my-memory/.npm-cache/_logs/2026-05-22T23_55_57_983Z-
+9 verbose logfile /Users/kil07201/.gemini/antigravity-ide/scratch/my-memory/.npm-cache/_logs/2026-05-22T23_55_57_983Z-debug-0.log
+10 silly logfile done cleaning log files
+11 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+12 verbose shrinkwrap failed to load node_modules/.package-lock.json out of date, updated: node_modules
+13 http fetch GET 200 https://registry.npmjs.org/create-vite 82ms (cache miss)
+14 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+15 http fetch GET 200 https://registry.npmjs.org/npm 175ms
+16 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+17 silly idealTree buildDeps
+18 silly fetch manifest create-vite@9.0.7
+19 silly packumentCache full:https://registry.npmjs.org/create-vite cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/create-vite 209ms (cache miss)
+21 silly packumentCache full:https://registry.npmjs.org/create-vite set size:undefined disposed:false
+22 silly placeDep ROOT create-vite@9.0.7 OK for:  want: 9.0.7
+23 silly reify moves {}
+24 silly audit bulk request { 'create-vite': [ '9.0.7' ] }
+25 http cache create-vite@https://registry.npmjs.org/create-vite/-/create-vite-9.0.7.tgz 1ms (cache hit)
+26 silly tarball no local data for create-vite@https://registry.npmjs.org/create-vite/-/create-vite-9.0.7.tgz. Extracting by manifest.
+27 http fetch GET 200 https://registry.npmjs.org/create-vite/-/create-vite-9.0.7.tgz 76ms (cache miss)
+28 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 156ms
+29 silly audit report {}
+30 verbose cwd /Users/kil07201/.gemini/antigravity-ide/scratch/my-memory
+31 verbose os Darwin 25.5.0
+32 verbose node v24.12.0
+33 verbose npm  v11.6.2
+34 notice
+34 notice New minor version of npm available! 11.6.2 -> 11.15.0
+34 notice Changelog: https://github.com/npm/cli/releases/tag/v11.15.0
+34 notice To update run: npm install -g npm@11.15.0
+34 notice  { force: true, Symbol(proc-log.meta): true }
+35 verbose exit 0
+36 info ok
