@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://zlkdjkdj:kil34530@cluster0.6fsxsk9.mongodb.net/diarydb?retryWrites=true&w=majority
+
+server:
+  port: 8089
