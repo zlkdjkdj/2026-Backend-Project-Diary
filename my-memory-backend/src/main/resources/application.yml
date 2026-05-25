@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://zlkdjkdj:kil34530@cluster0.6fsxsk9.mongodb.net/diarydb?retryWrites=true&w=majority
+      # uri는 보안을 위해 환경변수(MONGO_URI)로 주입받습니다.
 
 server:
   port: 8089
