@@ -1,42 +1,63 @@
 package com.jaehyun.diary.api;
 
-import com.jaehyun.diary.dto.DiaryDto;
+import com.jaehyun.diary.dto.DiaryForm;
 import com.jaehyun.diary.service.DiaryService;
-import lombok.RequiredArgsConstructor;
+import com.jaehyun.diary.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/diary")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class DiaryApiController {
 
-    private final DiaryService diaryService;
+    @Autowired
+    private DiaryService diaryService;
+    @Autowired
+    private FileService fileService;
 
     @PostMapping
-    public DiaryDto createDiary(@RequestBody DiaryDto diaryDto) {
-        return diaryService.createDiary(diaryDto);
+    public DiaryForm createDiary(
+            Principal principal,
+            @RequestPart("diary") DiaryForm diaryForm,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = fileService.saveFile(image);
+            diaryForm.setImageUrl(imageUrl);
+        }
+        return diaryService.createDiary(principal.getName(), diaryForm);
     }
 
     @GetMapping
-    public List<DiaryDto> getAllDiaries() {
-        return diaryService.getAllDiaries();
+    public List<DiaryForm> getAllDiaries(Principal principal) {
+        return diaryService.getAllDiaries(principal.getName());
     }
 
     @GetMapping("/search")
-    public List<DiaryDto> searchDiaries(@RequestParam String userId, @RequestParam String keyword) {
-        return diaryService.searchDiaries(userId, keyword);
+    public List<DiaryForm> searchDiaries(Principal principal, @RequestParam("keyword") String keyword) {
+        return diaryService.searchDiaries(principal.getName(), keyword);
     }
 
     @PutMapping("/{id}")
-    public DiaryDto updateDiary(@PathVariable String id, @RequestBody DiaryDto diaryDto) {
-        return diaryService.updateDiary(id, diaryDto);
+    public DiaryForm updateDiary(
+            Principal principal,
+            @PathVariable("id") String id,
+            @RequestPart("diary") DiaryForm diaryForm,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = fileService.saveFile(image);
+            diaryForm.setImageUrl(imageUrl);
+        }
+        return diaryService.updateDiary(principal.getName(), id, diaryForm);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDiary(@PathVariable String id) {
-        diaryService.deleteDiary(id);
+    public void deleteDiary(Principal principal, @PathVariable("id") String id) {
+        diaryService.deleteDiary(principal.getName(), id);
     }
 }

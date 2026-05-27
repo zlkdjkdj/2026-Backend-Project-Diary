@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @Document(collection = "diary")
-public class Diary {
+public class DiaryEntity {
     @Id
     private String id;
     private String userId;

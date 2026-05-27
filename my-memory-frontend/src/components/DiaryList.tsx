@@ -7,15 +7,16 @@ interface DiaryListProps {
   fetchLoading: boolean;
   onEdit: (diary: Diary) => void;
   onDelete: (id: string) => void;
+  onView: (diary: Diary) => void;
 }
 
-const DiaryList: React.FC<DiaryListProps> = ({ diaries, fetchLoading, onEdit, onDelete }) => {
+const DiaryList: React.FC<DiaryListProps> = ({ diaries, fetchLoading, onEdit, onDelete, onView }) => {
   if (diaries.length === 0 && !fetchLoading) {
     return (
-      <div className="text-center py-16 bg-slate-900/20 border border-dashed border-slate-800/80 rounded-2xl">
-        <span className="text-4xl">📭</span>
-        <p className="text-slate-400 font-medium text-sm mt-3">기록된 일기가 없습니다.</p>
-        <p className="text-slate-600 text-xs mt-1">오늘 있었던 하루를 첫 번째 일기로 남겨보세요!</p>
+      <div className="text-center py-16 bg-white border border-dashed border-gray-250/80 rounded-2xl">
+        <span className="text-3xl">📭</span>
+        <p className="text-gray-500 font-medium text-sm mt-3">기록된 일기가 없습니다.</p>
+        <p className="text-gray-400 text-xs mt-1">오늘의 기억을 기록해보세요.</p>
       </div>
     );
   }
@@ -23,7 +24,7 @@ const DiaryList: React.FC<DiaryListProps> = ({ diaries, fetchLoading, onEdit, on
   return (
     <div className="space-y-4">
       {diaries.map((diary) => (
-        <DiaryItem key={diary.id} diary={diary} onEdit={onEdit} onDelete={onDelete} />
+        <DiaryItem key={diary.id} diary={diary} onEdit={onEdit} onDelete={onDelete} onView={onView} />
       ))}
     </div>
   );

@@ -4,7 +4,7 @@ import { EMOTIONS, type Diary } from '../types/diary';
 interface DiaryFormProps {
   initialData?: Diary;
   isEditing: boolean;
-  onSubmit: (diary: Diary) => void;
+  onSubmit: (diary: Diary, imageFile: File | null) => void;
   onCancel: () => void;
   actionLoading: boolean;
 }
@@ -16,7 +16,6 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   onCancel,
   actionLoading,
 }) => {
-  const [userId, setUserId] = useState(initialData?.userId || 'kil07201');
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [emotion, setEmotion] = useState(initialData?.emotion || 'Happy');
@@ -24,24 +23,36 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   const [createdAt, setCreatedAt] = useState(
     initialData?.createdAt || new Date().toISOString().split('T')[0]
   );
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
-      setUserId(initialData.userId);
       setTitle(initialData.title);
       setContent(initialData.content);
       setEmotion(initialData.emotion);
       setImageUrl(initialData.imageUrl || '');
+      setPreviewUrl(initialData.imageUrl || '');
       setCreatedAt(initialData.createdAt || new Date().toISOString().split('T')[0]);
+      setImageFile(null);
     } else {
-      setUserId('kil07201');
       setTitle('');
       setContent('');
       setEmotion('Happy');
       setImageUrl('');
+      setPreviewUrl('');
       setCreatedAt(new Date().toISOString().split('T')[0]);
+      setImageFile(null);
     }
   }, [initialData]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,43 +61,29 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
       return;
     }
     onSubmit({
-      userId,
+      userId: '', // 백엔드에서 인증 토큰으로 처리됨
       title,
       content,
       emotion,
       imageUrl: imageUrl.trim() ? imageUrl : undefined,
       createdAt,
-    });
+    }, imageFile);
   };
 
   return (
-    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/85 rounded-2xl p-6 shadow-xl sticky top-28">
-      <h2 className="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
-        <span>{isEditing ? '✏️ 일기 수정하기' : '✍️ 새로운 하루 기록'}</span>
+    <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm sticky top-28">
+      <h2 className="text-base font-semibold text-gray-900 mb-6 flex items-center gap-2 tracking-tight">
+        <span>{isEditing ? '일기 수정하기' : '새로운 기록'}</span>
         {isEditing && (
-          <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-normal">
-            수정 모드
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-medium">
+            수정 중
           </span>
         )}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            작성자 ID
-          </label>
-          <input
-            type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="작성자 ID"
-            required
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 transition-all outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
             날짜
           </label>
           <input
@@ -94,13 +91,13 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             value={createdAt}
             onChange={(e) => setCreatedAt(e.target.value)}
             required
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 transition-all outline-none"
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-405 transition-colors outline-none text-sm"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            오늘의 기분 (감정)
+          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            기분
           </label>
           <div className="grid grid-cols-3 gap-2">
             {EMOTIONS.map((emo) => {
@@ -110,14 +107,14 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
                   key={emo.name}
                   type="button"
                   onClick={() => setEmotion(emo.name)}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-xs font-medium cursor-pointer ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all text-xs font-medium cursor-pointer ${
                     isSelected
-                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20 scale-105'
-                      : 'bg-slate-950 border-slate-850 hover:border-slate-700 text-slate-300'
+                      ? 'bg-black border-black text-white scale-[1.02] shadow-sm'
+                      : 'bg-white border-gray-250 hover:border-gray-450 text-gray-800'
                   }`}
                 >
-                  <span className="text-xl">{emo.emoji}</span>
-                  <span>{emo.label}</span>
+                  <span className="text-lg">{emo.emoji}</span>
+                  <span className="text-[11px]">{emo.label}</span>
                 </button>
               );
             })}
@@ -125,48 +122,47 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            일기 제목
+          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            제목
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="오늘 하루를 한 줄로 요약한다면?"
+            placeholder="오늘 하루를 요약해보세요"
             required
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 transition-all outline-none"
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            일기 내용
+          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            내용
           </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="오늘 어떤 특별한 일이 있었나요? 자세하게 나누어 주세요..."
+            placeholder="오늘 하루 어떤 기록을 남기고 싶으신가요?"
             required
             rows={5}
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 transition-all outline-none resize-none"
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm resize-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            이미지 URL (선택)
+          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            이미지 (선택)
           </label>
           <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 transition-all outline-none"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
           />
-          {imageUrl.trim() && (
-            <div className="mt-3 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 h-32 flex items-center justify-center">
+          {previewUrl && (
+            <div className="mt-3 relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 h-32 flex items-center justify-center">
               <img
-                src={imageUrl}
+                src={previewUrl}
                 alt="미리보기"
                 className="h-full w-full object-cover"
                 onError={(e) => {
@@ -174,6 +170,18 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
                     'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=300';
                 }}
               />
+              <button
+                type="button"
+                onClick={() => {
+                  setImageFile(null);
+                  setPreviewUrl('');
+                  setImageUrl('');
+                }}
+                className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs transition-colors cursor-pointer"
+                title="이미지 제거"
+              >
+                ✕
+              </button>
             </div>
           )}
         </div>
@@ -183,7 +191,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-850 text-slate-300 font-medium py-3 px-4 rounded-xl transition-all"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-colors text-sm cursor-pointer"
             >
               취소
             </button>
@@ -191,9 +199,9 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
           <button
             type="submit"
             disabled={actionLoading}
-            className="flex-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 active:scale-[0.98] disabled:opacity-50"
+            className="flex-2 bg-black hover:bg-neutral-800 text-white font-medium py-2.5 px-4 rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50 text-sm cursor-pointer"
           >
-            {isEditing ? '수정 완료' : '저장하기 🚀'}
+            {isEditing ? '수정 완료' : '저장하기'}
           </button>
         </div>
       </form>

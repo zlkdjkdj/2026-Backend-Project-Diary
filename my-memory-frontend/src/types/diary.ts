@@ -16,3 +16,20 @@ export const EMOTIONS = [
   { name: 'Sad', emoji: '😢', color: 'blue', label: '슬픔' },
   { name: 'Angry', emoji: '😡', color: 'rose', label: '화남' },
 ];
+
+export interface LoginRequest {
+  email: string;
+  password?: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password?: string;
+  nickname: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  email: string;
+  nickname: string;
+}

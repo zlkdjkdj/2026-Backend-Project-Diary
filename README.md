@@ -4,8 +4,6 @@
 
 전체 백엔드 설계는 가독성과 일관성을 보장하기 위해 필드 기반 의존성 주입(`@Autowired`), 분리된 레이어드 패키지 모델, 그리고 `Entity`/`Form` 명명 규칙을 적용한 **참고폴더 예제 형식**에 맞춰 리팩토링되었습니다.
 
-전체 설명과 안내는 [루트 README.md](file:///Users/kil07201/Desktop/my-memory/README.md)에 상세히 정리되어 있습니다.
-
 ---
 
 ## 📂 프로젝트 전체 디렉토리 구조
@@ -132,7 +130,7 @@ my-memory/
     2. `diaryRepository.findAll()`로 모든 컬렉션 데이터 수집 후 Jackson `objectMapper.writeValue()`를 써서 `backup.json` 임시 파일로 작성
     3. 로컬 디스크의 `uploads/` 폴더를 재귀 순회하여 `images.zip` 내부 스트림 압축 수행
     4. 생성된 `backup.json`과 `images.zip` 두 파일을 하나의 외부 ZIP 아카이브(`diary_backup.zip`)로 스트리밍 압축하여 사용자 Response로 파일 전송 실행
-    5. 사용 완료된 임시 공간 내 파일 및 디렉토리들은 `deleteDirectoryRecursive()`로 디스크 공간 복원 처리
+    5. 사용 완료된 임시 공간 폴더는 `deleteDirectoryRecursive()`로 디스크 공간 복원 처리
 
 * **데이터 복원 및 예외 안전성 롤백 (`POST /api/restore`)**
   * **API 컨트롤러**: `api/BackupApiController.java`의 `restoreBackup(MultipartFile file)` 메서드 실행

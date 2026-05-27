@@ -1,9 +1,10 @@
 package com.jaehyun.diary.repository;
 
-import com.jaehyun.diary.entity.Diary;
+import com.jaehyun.diary.entity.DiaryEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
-public interface DiaryRepository extends MongoRepository<Diary, String> {
-    List<Diary> findByUserIdAndContentContaining(String userId, String content);
+public interface DiaryRepository extends MongoRepository<DiaryEntity, String> {
+    List<DiaryEntity> findByUserId(String userId);
+    List<DiaryEntity> findByUserIdAndContentContaining(String userId, String content);
 }
