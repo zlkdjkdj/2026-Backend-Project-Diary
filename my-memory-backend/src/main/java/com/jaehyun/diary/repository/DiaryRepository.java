@@ -1,6 +1,6 @@
 package com.jaehyun.diary.repository;
 
-import com.jaehyun.diary.domain.Diary;
+import com.jaehyun.diary.entity.Diary;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 

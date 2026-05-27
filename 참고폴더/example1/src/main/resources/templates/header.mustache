@@ -1,0 +1,17 @@
+<h1> 메뉴 :<a href="/">홈</a>  <a href="/intro">사이트소개</a>  <a href="/order">주문</a>
+
+    {{#userName}}
+        {{userName}}님 환영합니다!
+        <a href="/logout">로그아웃</a>
+        {{#isAdmin}}
+            <a href="/admin" style="color:red;">[관리자 페이지]</a>
+        {{/isAdmin}}
+    {{/userName}}
+
+    {{^userName}}
+        <a href="/login">로그인</a>
+        <a href="/join">회원가입</a>
+    {{/userName}}
+</h1>
+
+<hr/>

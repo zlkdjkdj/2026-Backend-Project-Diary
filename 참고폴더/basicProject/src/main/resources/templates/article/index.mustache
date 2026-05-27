@@ -1,0 +1,28 @@
+{{>layouts/header}}
+
+<div class="container mt-5">
+    <h1>게시판 목록</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">번호</th>
+            <th scope="col">제목</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#articleList}}
+            <tr>
+                <td>{{id}}</td>
+                <td>
+                    <a href="/articles/{{id}}">{{title}}</a>
+                </td>
+            </tr>
+        {{/articleList}}
+        </tbody>
+    </table>
+
+    <a href="/articles/new" >새 글 작성</a>
+</div>
+
+{{>layouts/footer}}

@@ -11,3 +11,33 @@ Content-Type: application/json
 
 ### 2. 일기 목록 조회 테스트 (GET)
 GET http://localhost:8089/api/diary
+
+### 3. 일기 수정 테스트 (PUT)
+# 주의: 아래 {id} 부분을 실제 일기 생성 후 반환된 id 값으로 변경한 뒤 테스트하세요.
+PUT http://localhost:8089/api/diary/{id}
+Content-Type: application/json
+
+{
+  "userId": "kil07201",
+  "title": "안티그래비티 수정 테스트",
+  "content": "수정 기능이 추가되었다!",
+  "emotion": "Joy"
+}
+
+### 4. 일기 삭제 테스트 (DELETE)
+# 주의: 아래 {id} 부분을 실제 일기 생성 후 반환된 id 값으로 변경한 뒤 테스트하세요.
+DELETE http://localhost:8089/api/diary/{id}
+
+### 5. 존재하지 않는 ID 수정 예외 테스트 (PUT - IllegalArgumentException 예외 확인)
+PUT http://localhost:8089/api/diary/60b9d9999999999999999999
+Content-Type: application/json
+
+{
+  "userId": "kil07201",
+  "title": "존재하지 않는 ID 수정",
+  "content": "예외가 정상적으로 발생하는지 테스트",
+  "emotion": "Sad"
+}
+
+### 6. 존재하지 않는 ID 삭제 예외 테스트 (DELETE - IllegalArgumentException 예외 확인)
+DELETE http://localhost:8089/api/diary/60b9d9999999999999999999

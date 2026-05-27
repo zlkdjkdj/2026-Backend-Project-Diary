@@ -15,10 +15,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        String mongoUri = System.getenv("MONGO_URI");
-        if (mongoUri == null || mongoUri.isEmpty()) {
-            throw new IllegalArgumentException("MONGO_URI environment variable is not set!");
-        }
-        return MongoClients.create(mongoUri);
+        return MongoClients.create("mongodb+srv://zlkdjkdj:kil34530@cluster0.6fsxsk9.mongodb.net/diarydb?retryWrites=true&w=majority");
     }
 }

@@ -1,0 +1,25 @@
+{{>layouts/header}}
+
+<div class="container mt-5">
+    <h1>게시판 수정하기</h1>
+    {{#article}}
+        <form action="/articles/update" method="post">
+            <input type="hidden" name="id" value="{{id}}">
+
+            <div class="mb-3">
+                <label for="title" class="form-label">제목</label>
+                <input type="text" name="title" class="form-control" id="title" value="{{title}}">
+            </div>
+
+            <div class="mb-3">
+                <label for="contents" class="form-label">내용</label>
+                <textarea name="contents" class="form-control" id="contents" rows="3">{{contents}}</textarea>
+            </div>
+
+            <button type="submit" >수정완료</button>
+            <a href="/articles/{{id}}" >취소</a>
+        </form>
+    {{/article}}
+</div>
+
+{{>layouts/footer}}
