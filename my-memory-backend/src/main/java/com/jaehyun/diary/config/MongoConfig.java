@@ -8,6 +8,9 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
+    @org.springframework.beans.factory.annotation.Value("${spring.data.mongodb.uri}")
+    private String mongoUri;
+
     @Override
     protected String getDatabaseName() {
         return "diarydb";
@@ -15,6 +18,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        return MongoClients.create("mongodb+srv://zlkdjkdj:kil34530@cluster0.6fsxsk9.mongodb.net/diarydb?retryWrites=true&w=majority");
+        return MongoClients.create(mongoUri);
     }
 }

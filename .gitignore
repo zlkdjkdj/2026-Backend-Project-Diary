@@ -1,0 +1,23 @@
+# Environment & secrets
+.env
+.env.local
+*.env
+application-local.yml
+application-prod.yml
+
+# Build artifacts
+build/
+target/
+dist/
+node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Uploads
+uploads/
+
+# OS
+.DS_Store
