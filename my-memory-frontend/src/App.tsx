@@ -23,6 +23,8 @@ function App() {
 
   // Search & Filter State
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [onlyWithImages, setOnlyWithImages] = useState(false);
 
   // Form State
   const [isEditing, setIsEditing] = useState(false);
@@ -33,6 +35,9 @@ function App() {
 
   // Alert State
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Google Drive Widget State
+  const [showDriveWidget, setShowDriveWidget] = useState(true);
 
   const showAlert = (text: string, type: 'success' | 'error' = 'success') => {
     setAlertMessage({ type, text });
@@ -96,26 +101,7 @@ function App() {
     }
   };
 
-  // Search diaries
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token) return;
-    if (!searchKeyword.trim()) {
-      fetchDiaries();
-      return;
-    }
-    setFetchLoading(true);
-    setError(null);
-    try {
-      const data = await diaryApi.search(searchKeyword);
-      setDiaries(data);
-      showAlert(`"${searchKeyword}" 검색 완료!`);
-    } catch (err: any) {
-      setError(err.message || '검색 오류가 발생했습니다.');
-    } finally {
-      setFetchLoading(false);
-    }
-  };
+
 
   // Save diary (Create or Update)
   const handleSaveDiary = async (diary: Diary, imageFile: File | null) => {
@@ -225,6 +211,29 @@ function App() {
     }
   }, [token]);
 
+  // Filter diaries locally based on search filters
+  const filteredDiaries = diaries.filter((diary) => {
+    // 1. Keyword search
+    if (searchKeyword.trim()) {
+      const keyword = searchKeyword.toLowerCase();
+      const titleMatch = diary.title?.toLowerCase().includes(keyword);
+      const contentMatch = diary.content?.toLowerCase().includes(keyword);
+      if (!titleMatch && !contentMatch) return false;
+    }
+
+    // 2. Date search
+    if (searchDate) {
+      if (diary.createdAt !== searchDate) return false;
+    }
+
+    // 3. Image search
+    if (onlyWithImages) {
+      if (!diary.imageUrl) return false;
+    }
+
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#1d1d1f] flex flex-col antialiased">
       {/* Header */}
@@ -264,6 +273,14 @@ function App() {
                   className="hidden"
                 />
               </label>
+              <a
+                href="https://drive.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 text-xs rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 border border-transparent font-medium cursor-pointer transition-colors inline-flex items-center gap-1"
+              >
+                구글드라이브 이동 ↗
+              </a>
               <button
                 onClick={handleLogout}
                 className="px-3 py-1.5 text-xs rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 transition-colors border border-transparent font-medium cursor-pointer"
@@ -294,9 +311,9 @@ function App() {
         {!token ? (
           <AuthForm onLogin={handleLogin} onRegister={handleRegister} isLoading={actionLoading} />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Column: Form Card */}
-            <div className="lg:col-span-5">
+          <div className="max-w-7xl mx-auto w-full space-y-8">
+            {/* Centered Diary Form Card */}
+            <div className="max-w-5xl mx-auto w-full">
               <DiaryForm
                 initialData={editingDiary}
                 isEditing={isEditing}
@@ -311,51 +328,75 @@ function App() {
               />
             </div>
 
-            {/* Right Column: List & Filter */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Search Filter Box */}
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between">
-                <div className="flex-grow">
-                  <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                    일기 검색
+            {/* Divider and List Section */}
+            <div className="border-t border-gray-200/80 pt-8 space-y-6">
+              {/* Search & Filter Box */}
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                    검색 및 필터
                   </h3>
-                  <form onSubmit={handleSearch} className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSearchKeyword('');
+                      setSearchDate('');
+                      setOnlyWithImages(false);
+                      fetchDiaries();
+                    }}
+                    className="text-xs text-gray-400 hover:text-black transition-colors font-medium cursor-pointer"
+                  >
+                    필터 초기화
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  {/* Keyword Input */}
+                  <div className="md:col-span-5">
+                    <label className="block text-[10px] font-semibold text-gray-400 mb-1.5 uppercase">키워드 검색</label>
                     <input
                       type="text"
                       value={searchKeyword}
                       onChange={(e) => setSearchKeyword(e.target.value)}
-                      placeholder="키워드 검색"
-                      className="flex-grow bg-white border border-gray-200 focus:border-black rounded-xl px-4 py-2 text-sm text-gray-900 outline-none transition-colors"
+                      placeholder="제목 또는 내용 검색"
+                      className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-sm text-gray-900 outline-none transition-colors"
                     />
+                  </div>
+
+                  {/* Date Input */}
+                  <div className="md:col-span-5">
+                    <label className="block text-[10px] font-semibold text-gray-400 mb-1.5 uppercase">날짜 검색</label>
+                    <input
+                      type="date"
+                      value={searchDate}
+                      onChange={(e) => setSearchDate(e.target.value)}
+                      className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-sm text-gray-900 outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Action Buttons (Refresh) */}
+                  <div className="md:col-span-2 flex items-end justify-end md:justify-center md:border-l md:border-gray-100 md:pl-2">
                     <button
-                      type="submit"
-                      className="bg-black hover:bg-neutral-800 text-white text-sm font-medium py-2 px-4 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
+                      onClick={fetchDiaries}
+                      disabled={fetchLoading}
+                      className="flex flex-col items-center justify-center p-1.5 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer w-full"
                     >
-                      검색
+                      <span className="text-lg">🔄</span>
+                      <span className="text-[10px] text-gray-400 font-semibold mt-0.5">새로고침</span>
                     </button>
-                    {searchKeyword && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchKeyword('');
-                          fetchDiaries();
-                        }}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-650 px-3 rounded-xl text-sm transition-colors cursor-pointer"
-                      >
-                        취소
-                      </button>
-                    )}
-                  </form>
+                  </div>
                 </div>
-                <div className="ml-6 pl-6 border-l border-gray-200">
-                  <button
-                    onClick={fetchDiaries}
-                    disabled={fetchLoading}
-                    className="flex flex-col items-center justify-center p-2 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <span className="text-lg">🔄</span>
-                    <span className="text-[10px] text-gray-400 font-semibold mt-1">새로고침</span>
-                  </button>
+
+                {/* Additional filters (Checkbox) */}
+                <div className="flex items-center gap-2 pt-2">
+                  <label className="flex items-center gap-2 text-xs text-gray-755 font-medium cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={onlyWithImages}
+                      onChange={(e) => setOnlyWithImages(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer accent-black"
+                    />
+                    이미지 있는 일기만 모아보기
+                  </label>
                 </div>
               </div>
 
@@ -371,14 +412,14 @@ function App() {
                 <h3 className="text-gray-950 font-semibold text-base flex items-center gap-2 tracking-tight">
                   <span>{currentUser?.nickname}님의 일기 목록</span>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600">
-                    {diaries.length}개
+                    {filteredDiaries.length}개
                   </span>
                 </h3>
               </div>
 
               {/* List Grid */}
               <DiaryList
-                diaries={diaries}
+                diaries={filteredDiaries}
                 fetchLoading={fetchLoading}
                 onEdit={startEdit}
                 onDelete={handleDelete}
@@ -388,6 +429,39 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* Floating Google Drive Widget at bottom right */}
+      {token && currentUser && showDriveWidget && (
+        <div className="fixed bottom-6 right-6 z-40 w-64 bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-3xl p-5 shadow-2xl hover:shadow-neutral-300/30 transition-all duration-300 flex flex-col justify-between min-h-[240px]">
+          <div className="flex justify-between items-start">
+            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-lg shadow-md shadow-blue-500/20">
+              💾
+            </div>
+            <button
+              onClick={() => setShowDriveWidget(false)}
+              className="text-gray-400 hover:text-gray-650 p-1 cursor-pointer transition-colors text-xs font-semibold"
+              title="닫기"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-2 mt-4 flex-grow">
+            <h4 className="text-xs font-bold text-gray-900 tracking-tight">구글 드라이브 백업</h4>
+            <p className="text-[11px] text-gray-650 leading-relaxed font-medium">
+              로컬 백업 파일을 구글드라이브로 업로드 하면 장소에 상관없이 일기 조회가 가능합니다!
+            </p>
+          </div>
+          <a
+            href="https://drive.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-blue-600/10 active:scale-[0.98] cursor-pointer text-xs mt-4"
+          >
+            <span>구글 드라이브 이동</span>
+            <span className="text-sm">↗</span>
+          </a>
+        </div>
+      )}
 
       {viewingDiary && (
         <DiaryDetailModal diary={viewingDiary} onClose={() => setViewingDiary(null)} />

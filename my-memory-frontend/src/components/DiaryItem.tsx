@@ -21,11 +21,11 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
       className="group bg-white border border-gray-200/80 rounded-2xl p-5 transition-all duration-300 hover:shadow-sm hover:translate-y-[-1px] flex flex-col md:flex-row gap-5 cursor-pointer"
     >
       {diary.imageUrl && (
-        <div className="md:w-32 h-24 md:h-auto rounded-xl overflow-hidden border border-gray-150 bg-gray-50 flex-shrink-0">
+        <div className="w-full md:w-36 h-48 md:h-28 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 flex-shrink-0">
           <img
             src={diary.imageUrl}
             alt={diary.title}
-            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
                 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=300';
@@ -75,7 +75,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
             {diary.title}
           </h4>
           {/* Content */}
-          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+          <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 overflow-hidden text-ellipsis whitespace-pre-wrap">
             {diary.content}
           </p>
         </div>

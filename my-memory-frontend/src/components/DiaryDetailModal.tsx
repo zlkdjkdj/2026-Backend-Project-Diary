@@ -16,7 +16,7 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-gray-100 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Sticky Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-md z-10">
           <div className="flex items-center gap-2.5">
@@ -41,11 +41,11 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
         <div className="p-6 space-y-6">
           {/* Large Image */}
           {diary.imageUrl && (
-            <div className="w-full max-h-96 rounded-xl overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
+            <div className="w-full max-h-[550px] rounded-xl overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
               <img
                 src={diary.imageUrl}
                 alt={diary.title}
-                className="w-full h-full object-contain max-h-96"
+                className="w-full h-full object-contain max-h-[550px]"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}

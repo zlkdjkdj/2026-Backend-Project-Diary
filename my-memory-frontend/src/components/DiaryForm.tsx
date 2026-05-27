@@ -71,17 +71,17 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm sticky top-28">
-      <h2 className="text-base font-semibold text-gray-900 mb-6 flex items-center gap-2 tracking-tight">
+    <div className="bg-white border border-gray-200/80 rounded-2xl p-8 md:p-10 shadow-sm">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 tracking-tight">
         <span>{isEditing ? '일기 수정하기' : '새로운 기록'}</span>
         {isEditing && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-medium">
+          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-medium">
             수정 중
           </span>
         )}
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
             날짜
@@ -99,7 +99,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
           <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
             기분
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {EMOTIONS.map((emo) => {
               const isSelected = emotion === emo.name;
               return (
@@ -122,7 +122,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
             제목
           </label>
           <input
@@ -131,12 +131,12 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="오늘 하루를 요약해보세요"
             required
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm"
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors outline-none text-base"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
             내용
           </label>
           <textarea
@@ -144,8 +144,8 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             onChange={(e) => setContent(e.target.value)}
             placeholder="오늘 하루 어떤 기록을 남기고 싶으신가요?"
             required
-            rows={5}
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm resize-none"
+            rows={10}
+            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors outline-none text-base resize-none"
           />
         </div>
 
