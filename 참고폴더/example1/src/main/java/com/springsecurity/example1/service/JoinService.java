@@ -42,7 +42,7 @@ public class JoinService {
                 .nickname(joinDTO.getNickname())
                 .role(role)
                 .build();
-
-        userRepository.save(user);
+ 
+        userRepository.save(java.util.Objects.requireNonNull(user));
     }
 }

@@ -22,7 +22,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @org.springframework.lang.NonNull HttpServletRequest request,
+            @org.springframework.lang.NonNull HttpServletResponse response,
+            @org.springframework.lang.NonNull FilterChain filterChain) throws ServletException, IOException {
 
         // 1. 헤더에서 Authorization 토큰 꺼내기
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);

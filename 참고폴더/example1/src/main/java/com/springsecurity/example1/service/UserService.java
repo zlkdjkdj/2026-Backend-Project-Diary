@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
+    @SuppressWarnings("unused")
     private final UserRepository userRepository;
 
 //    @Transactional
