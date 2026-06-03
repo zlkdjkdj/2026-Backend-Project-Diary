@@ -1,5 +1,5 @@
 // Mock 모드 확인 (기본값 true)
-export const isMock = (): boolean => localStorage.getItem('use_mock') !== 'false';
+export const isMock = (): boolean => false;
 
 // 현재 로그인한 사용자 ID (email)
 export const getCurrentUserId = (): string => {

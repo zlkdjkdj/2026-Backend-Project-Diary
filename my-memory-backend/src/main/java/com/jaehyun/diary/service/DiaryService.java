@@ -1,5 +1,6 @@
 package com.jaehyun.diary.service;
 
+import com.jaehyun.diary.config.CheckOwnership;
 import com.jaehyun.diary.dto.DiaryForm;
 import com.jaehyun.diary.entity.DiaryEntity;
 import com.jaehyun.diary.repository.DiaryRepository;
@@ -33,24 +34,16 @@ public class DiaryService {
                 .collect(Collectors.toList());
     }
 
+    @CheckOwnership
     public DiaryForm updateDiary(String email, String id, DiaryForm form) {
-        DiaryEntity diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("일기가 존재하지 않습니다. ID: " + id));
-        if (!diary.getUserId().equals(email)) {
-            throw new IllegalArgumentException("권한이 없습니다.");
-        }
         form.setUserId(email);
         DiaryEntity updatedDiary = form.toEntity();
         updatedDiary.setId(id);
         return DiaryForm.fromEntity(diaryRepository.save(updatedDiary));
     }
 
+    @CheckOwnership
     public void deleteDiary(String email, String id) {
-        DiaryEntity diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("일기가 존재하지 않습니다. ID: " + id));
-        if (!diary.getUserId().equals(email)) {
-            throw new IllegalArgumentException("권한이 없습니다.");
-        }
         diaryRepository.deleteById(id);
     }
 }

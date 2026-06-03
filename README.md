@@ -2,7 +2,7 @@
 
 이 프로젝트는 **React(프론트엔드)**와 **Spring Boot + MongoDB(백엔드)**를 활용하여 구축된 개인 일기장 애플리케이션입니다. 사용자 인증(JWT), 이미지 업로드, 그리고 안전성 및 데이터 정합성을 완벽하게 보장하는 백업 및 복원 기능을 제공합니다.
 
-전체 백엔드 설계는 가독성과 일관성을 보장하기 위해 필드 기반 의존성 주입(`@Autowired`), 분리된 레이어드 패키지 모델, 그리고 `Entity`/`Form` 명명 규칙을 적용한 **참고폴더 예제 형식**에 맞춰 리팩토링되었습니다.
+이 프로젝트는 백엔드가 오프라인 상태일 때도 프론트엔드에서 100% 브라우저 로컬 저장소 기반의 Mocking 모드로 구동할 수 있으며, 백엔드 연결 설정을 통해 실제 MongoDB Atlas 데이터베이스 환경과 매끄럽게 연결되는 유연한 전환 구조를 탑재하고 있습니다.
 
 ---
 
@@ -12,10 +12,28 @@
 my-memory/
 ├── my-memory-frontend/            # 프론트엔드 (React + TypeScript + Vite)
 │   ├── src/
-│   │   ├── api/                   # API 호출 인터페이스 (diaryApi.ts, authApi.ts)
-│   │   ├── components/            # UI 컴포넌트 (일기 카드, 에디터 폼, 모달 상세창 등)
-│   │   ├── types/                 # TypeScript 공통 인터페이스 및 타입 정의
-│   │   └── App.tsx                # 전체 상태 관리 및 헤더 UI 바인딩
+│   │   ├── api/                   # API 통신 계층 (백엔드 통신 & Mocking 스위칭 제공)
+│   │   │   ├── apiConfig.ts       # Mocking 사용 여부 감지 및 Axios 공통 인스턴스 설정
+│   │   │   ├── authApi.ts         # 로그인/회원가입 API 정의 (Mock / Real)
+│   │   │   └── diaryApi.ts        # 일기 생성/수정/삭제/검색 API 정의 (Mock / Real)
+│   │   │
+│   │   ├── components/            # UI 컴포넌트 레이어
+│   │   │   ├── DiaryCard.tsx      # 일기 카드 아이템 레이아웃 및 감정별 테마 적용
+│   │   │   ├── DiaryDetailModal.tsx # 일기 세부 본문 및 이미지 팝업 뷰어
+│   │   │   ├── DiaryFormModal.tsx # 일기 작성 및 수정 폼 (이미지 미리보기 지원)
+│   │   │   └── GoogleDriveWidget.tsx # (선택사항) 백업 파일 저장용 클라우드 위젯 UI
+│   │   │
+│   │   ├── pages/                 # 라우터 페이지 컴포넌트
+│   │   │   ├── LoginPage.tsx      # 로그인 화면
+│   │   │   ├── RegisterPage.tsx   # 회원가입 화면
+│   │   │   └── MainPage.tsx       # 일기 목록, 필터링, 검색 및 백업 관리 메인 대시보드
+│   │   │
+│   │   ├── types/                 # 공통 TypeScript 타입 선언
+│   │   │   └── diary.ts           # Diary 데이터 규격 인터페이스, Auth DTO 포맷, 감정 상수군
+│   │   │
+│   │   ├── App.tsx                # 라우터 처리, 상태 보존, 헤더 글로벌 내비게이션 바
+│   │   ├── index.css              # 전역 스타일 및 HSL 기반 감정 테마 변수 바인딩
+│   │   └── main.tsx               # 애플리케이션 엔트리 포인트
 │   └── vite.config.ts             # 프론트엔드 설정 및 /uploads, /api 프록시 설정
 │
 └── my-memory-backend/             # 백엔드 (Spring Boot + MongoDB Atlas)
@@ -57,110 +75,98 @@ my-memory/
 
 ---
 
-## ⚙️ 백엔드 모든 비즈니스 로직 및 파일 실행 경로 설명
+## 🎨 프론트엔드 구조 및 비즈니스 로직 설명
+
+프론트엔드는 단독(Mocking) 혹은 백엔드 연동(Real-API) 모드로 유연하게 스위칭되는 구조와 반응형 모던 UI 레이아웃으로 이루어져 있습니다.
+
+### 1. Mocking vs Real-API 전환 원리
+*   **감정 분석 설정 (`apiConfig.ts`)**:
+    *   브라우저의 `localStorage.getItem('use_mock')` 값에 따라 Mocking 여부를 판단합니다. 기본값(값이 존재하지 않거나 `true`인 경우)은 Mocking 활성 모드입니다.
+    *   백엔드 연결 모드로 동작시키려면 개발자 콘솔 등에서 아래 스크립트를 입력한 뒤 새로고침합니다.
+        ```javascript
+        localStorage.setItem('use_mock', 'false');
+        ```
+*   **[authApi.ts](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/api/authApi.ts) 분기 흐름**:
+    *   `isMock()`이 참일 때: `localStorage`의 `'mock_users'` 배열에 가입 데이터를 저장하고, 로그인 시 해당 데이터를 기반으로 가짜 JWT를 리턴합니다.
+    *   `isMock()`이 거짓일 때: 백엔드 `/api/auth/login`, `/api/auth/register` 서버 주소로 실제 HTTP POST 요청을 보냅니다.
+*   **[diaryApi.ts](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/api/diaryApi.ts) 분기 흐름**:
+    *   `isMock()`이 참일 때: 일기 등록, 수정, 삭제 시 `localStorage`의 `'mock_diaries'` 데이터를 직접 배열 연산으로 가공합니다. 이미지 파일 등록 시, 브라우저의 `FileReader` API를 이용해 파일을 **Base64** 데이터 주소(`data:image/...;base64,...`)로 인코딩하여 로컬 브라우저 내에 영구 보존합니다.
+    *   `isMock()`이 거짓일 때: HTTP 헤더에 Bearer 토큰을 실어 백엔드의 `/api/diary` REST 엔드포인트와 실제 통신을 수행합니다.
+
+### 2. UI 컴포넌트 및 상태 흐름
+*   **메인 상태 관리 (`App.tsx` & `MainPage.tsx`)**:
+    *   현재 로그인된 유저의 토큰 및 프로필 상태(`user`), 작성 모달 열림 여부 등을 React State로 유지합니다.
+    *   가입/로그인 검증이 완료되면 `MainPage`로 라우팅되어 개인 일기 데이터 목록을 자동으로 로드합니다.
+*   **상세 페이지 및 일기 카드 (`DiaryCard.tsx` & `DiaryDetailModal.tsx`)**:
+    *   `diary.ts`에 기재된 감정(Emotion) 상수군에 따라 HSL 테마 디자인 컬러(Rose, Sky, Emerald 등)가 카드 테두리 및 배경에 동적으로 배정됩니다.
+    *   카드 클릭 시 `DiaryDetailModal`이 팝업되며 본문 내용 및 등록된 첨부 이미지를 고해상도로 로드합니다.
+
+---
+
+## ⚙️ 백엔드 구조 및 비즈니스 로직 설명
+
+백엔드는 RESTful API 명세에 따른 계층형(Layered) 아키텍처로 설계되어 있습니다.
 
 ### 1. 사용자 인증 및 가입 로직
-
-* **회원가입 (`POST /api/auth/register`)**
-  * **API 컨트롤러**: `api/AuthApiController.java`의 `register(AuthForm.RegisterForm request)` 메서드 실행
-  * **비즈니스 로직**: `service/AuthService.java`의 `register(AuthForm.RegisterForm request)` 메서드 실행
-    1. `userRepository.existsByEmail()` 호출로 이메일 중복 체크
-    2. 중복이 아닐 시 `BCryptPasswordEncoder.encode()`를 사용해 패스워드 암호화
-    3. `UserEntity.builder()`를 통해 `UserRole.USER` 권한과 함께 DB 엔티티 생성 후 `userRepository.save()`로 기록
-
-* **로그인 (`POST /api/auth/login`)**
-  * **API 컨트롤러**: `api/AuthApiController.java`의 `login(AuthForm.LoginForm request)` 메서드 실행
-  * **비즈니스 로직**: `service/AuthService.java`의 `login(AuthForm.LoginForm request)` 메서드 실행
-    1. `userRepository.findByEmail()`을 호출해 등록 이메일 점검
-    2. `passwordEncoder.matches()`를 사용해 평문 비밀번호와 해시 비밀번호 매칭 확인
-    3. 비밀번호 확인 시 `config/JwtUtil.java`의 `createToken(email, role)`을 실행해 JWT 토큰 생성 및 `AuthForm.TokenResponse` 반환
-
-* **인가 통제 및 검증 필터**
-  * **토큰 검증 필터**: `config/JwtFilter.java`의 `doFilterInternal()` 실행
-    - 들어오는 모든 요청 헤더에서 Bearer 토큰 식별
-    - `JwtUtil.java`의 `validateToken(token)` 및 `getEmail(token)`, `getRole(token)`을 직접 활용하여 DB 조회 없이 세션 인가 컨텍스트 생성
-  * **보안 라우팅**: `config/SecurityConfig.java`의 `filterChain(HttpSecurity http)`
-    - 인증 제외 경로(`/api/auth/**`, `/uploads/**`) 등록 및 이외 모든 요청에 대해 시큐리티 인가 제한 처리
-
----
+*   **회원가입 (`POST /api/auth/register`)**
+    *   **흐름**: `AuthApiController` ➔ `AuthService` ➔ `UserRepository`
+    *   **로직**:
+        1. `userRepository.existsByEmail()` 호출로 이메일 중복 검사를 수행합니다.
+        2. 중복이 아닌 것이 검증되면 `BCryptPasswordEncoder.encode()`를 활용하여 평문 비밀번호를 해시 암호화합니다.
+        3. 암호화된 비밀번호와 기본 권한(`UserRole.USER`)을 매핑하여 `UserEntity`를 생성하고 DB에 영구 보존합니다.
+*   **로그인 (`POST /api/auth/login`)**
+    *   **흐름**: `AuthApiController` ➔ `AuthService` ➔ `UserRepository`
+    *   **로직**:
+        1. `userRepository.findByEmail()`을 호출해 계정 유무를 조회합니다.
+        2. 유저가 존재하면 `passwordEncoder.matches()`로 입력된 패스워드 해시 일치 여부를 파악합니다.
+        3. 검증 통과 시 `JwtUtil.createToken()`을 기동해 JWT Access Token을 발급하여 DTO 응답 객체에 담아 응답합니다.
+*   **보안 필터 및 인가 흐름**
+    *   **토큰 가로채기 필터 (`JwtFilter.java`)**: `OncePerRequestFilter`를 상속하여 요청마다 `Authorization` 헤더에서 Bearer 토큰을 가로챈 후 검증합니다. 통과 시 세션 인가 객체를 등록합니다.
+    *   **시큐리티 규칙 (`SecurityConfig.java`)**: `/api/auth/**`, `/uploads/**`를 제외한 모든 도메인 API 경로에 대해 인가된 사용자만 접근할 수 있도록 차단합니다.
 
 ### 2. 일기(Diary) CRUD 비즈니스 로직
-
-* **일기 작성 (`POST /api/diary`)**
-  * **API 컨트롤러**: `api/DiaryApiController.java`의 `createDiary(...)` 메서드 실행
-  * **비즈니스 로직**: `service/DiaryService.java`의 `createDiary(String email, DiaryForm form)` 메서드 실행
-    1. **이미지 저장**: 컨트롤러 단에서 파일 업로드 감지 시 `service/FileService.java`의 `saveFile(MultipartFile file)`을 가동하여 중복 없는 UUID 파일명으로 `uploads/` 폴더에 이미지를 저장하고 `DiaryForm.setImageUrl`에 경로 바인딩
-    2. 소유권 보존을 위해 `DiaryForm`의 `userId` 값을 로그인한 사용자의 메일로 저장
-    3. `DiaryForm.toEntity()` 변환 메서드를 호출해 `DiaryEntity` 객체 빌드
-    4. `diaryRepository.save()`를 호출해 최종 레코드 생성 및 DTO 규격 반환
-
-* **일기 목록 전체 조회 (`GET /api/diary`)**
-  * **API 컨트롤러**: `api/DiaryApiController.java`의 `getAllDiaries(Principal principal)` 메서드 실행
-  * **비즈니스 로직**: `service/DiaryService.java`의 `getAllDiaries(String email)` 메서드 실행
-    1. `diaryRepository.findByUserId(email)`을 호출해 본인 소유의 일기 레코드(`DiaryEntity`) 리스트만 필터링
-    2. `DiaryForm.fromEntity()`를 통해 DTO 타입 리스트로 맵핑 및 가공 후 프론트엔드로 응답
-
-* **일기 본문 내용 검색 (`GET /api/diary/search`)**
-  * **API 컨트롤러**: `api/DiaryApiController.java`의 `searchDiaries(Principal principal, String keyword)` 메서드 실행
-  * **비즈니스 로직**: `service/DiaryService.java`의 `searchDiaries(String email, String keyword)` 메서드 실행
-    1. `diaryRepository.findByUserIdAndContentContaining(email, keyword)`를 호출하여 지정 작성자의 본문 검색을 실행
-    2. 검색 조건에 일치하는 결과물 리스트를 DTO 배열 형식으로 제공
-
-* **일기 본문 수정 (`PUT /api/diary/{id}`)**
-  * **API 컨트롤러**: `api/DiaryApiController.java`의 `updateDiary(...)` 메서드 실행
-  * **비즈니스 로직**: `service/DiaryService.java`의 `updateDiary(String email, String id, DiaryForm form)` 메서드 실행
-    1. **소유권 검증**: `diaryRepository.findById(id)` 호출 및 기존 일기의 `userId`와 현재 로그인 이메일 대조 (비일치 시 권한 부족 예외 유발)
-    2. **이미지 교체**: 수정에 업로드된 신규 이미지가 있는 경우 `FileService`를 재호출하여 덮어쓰고, 이미지가 없을 시 기존의 `imageUrl` 속성을 유지
-    3. `DiaryForm.toEntity()`를 변환하여 `diaryRepository.save()`로 레코드 수정 저장
-
-* **일기 영구 삭제 (`DELETE /api/diary/{id}`)**
-  * **API 컨트롤러**: `api/DiaryApiController.java`의 `deleteDiary(Principal principal, String id)` 메서드 실행
-  * **비즈니스 로직**: `service/DiaryService.java`의 `deleteDiary(String email, String id)` 메서드 실행
-    1. 대상 일기의 존재 및 작성자 일치 여부를 파악
-    2. 정상 권한이 확인된 사용자에 한해 `diaryRepository.deleteById(id)`를 호출하여 데이터 소거
-
----
+*   **일기 등록 및 파일 저장 (`POST /api/diary`)**
+    *   **흐름**: `DiaryApiController` ➔ `DiaryService` ➔ `FileService` ➔ `DiaryRepository`
+    *   **로직**:
+        1. 이미지 파일이 함께 전달된 경우 `FileService.saveFile(MultipartFile)`을 구동해 고유한 UUID 기반 파일명을 생성한 후 `uploads/` 디렉토리에 물리 파일을 적재하고, 그 주소를 이미지 URL 경로로 설정합니다.
+        2. 인가 정보(`email`)를 소유주의 식별값인 `userId`로 활용하여 `DiaryEntity`에 저장합니다.
+*   **수정 및 소유권 검증 (`PUT /api/diary/{id}`)**
+    *   **로직**:
+        1. 수정 대상 일기의 기존 데이터와 요청 유저를 매핑하여 `userId`가 일치하는지 소유권 점검을 실시합니다. 권한이 없는 경우 예외를 즉각 발생시킵니다.
+        2. 수정 파일로 새 이미지가 넘어온 경우 기존 파일을 교체하여 저장하고, 없을 경우 기존 URL 정보를 보존합니다.
 
 ### 3. 일기 백업 및 정합성 보장형 복원 로직
-
-* **백업 파일 생성 및 내보내기 (`GET /api/backup`)**
-  * **API 컨트롤러**: `api/BackupApiController.java`의 `downloadBackup(HttpServletResponse response)` 메서드 실행
-  * **비즈니스 로직**: `service/BackupService.java`의 `createBackup(OutputStream outputStream)` 메서드 실행
-    1. `Files.createTempDirectory()`로 임시 작업 폴더 생성
-    2. `diaryRepository.findAll()`로 모든 컬렉션 데이터 수집 후 Jackson `objectMapper.writeValue()`를 써서 `backup.json` 임시 파일로 작성
-    3. 로컬 디스크의 `uploads/` 폴더를 재귀 순회하여 `images.zip` 내부 스트림 압축 수행
-    4. 생성된 `backup.json`과 `images.zip` 두 파일을 하나의 외부 ZIP 아카이브(`diary_backup.zip`)로 스트리밍 압축하여 사용자 Response로 파일 전송 실행
-    5. 사용 완료된 임시 공간 폴더는 `deleteDirectoryRecursive()`로 디스크 공간 복원 처리
-
-* **데이터 복원 및 예외 안전성 롤백 (`POST /api/restore`)**
-  * **API 컨트롤러**: `api/BackupApiController.java`의 `restoreBackup(MultipartFile file)` 메서드 실행
-  * **비즈니스 로직**: `service/BackupService.java`의 `restoreBackup(InputStream zipInputStream)` 메서드 실행
-    1. **임시 검증**: 임시 디렉토리를 열어 업로드한 ZIP 아카이브의 압축을 풀고 `backup.json` 유무 및 JSON 포맷 무결성을 먼저 분석 (파싱 실패 시 예외 던짐)
-    2. **대피소(Backup) 설정**: DB 및 물리 파일 쓰기 실패를 감안하여, 직전의 데이터베이스 데이터(`diaryRepository.findAll()`)를 메모리 리스트에 적재하고 `uploads/` 내 원본 이미지 파일들을 임시 대피 폴더(`tempUploadsBackupDir`)로 통복사
-    3. **트랜잭션 실행**:
-       - `diaryRepository.deleteAll()` 호출로 기존 일기를 전면 포맷
-       - 아카이브에서 파싱된 일기 리스트 적재(`diaryRepository.saveAll(newDiaries)`)
-       - 기존 `uploads/` 디렉토리를 비운 후 압축 해제된 새 이미지 파일 복사 적재
-    4. **롤백(Rollback) 작동**:
-       - 데이터 쓰기 도중 에러가 `catch`에 감지되면, DB를 다시 전체 포맷하고 백업 메모리에 담아두었던 예전 일기 리스트를 재적재
-       - 디렉토리의 파일을 초기화하고 `tempUploadsBackupDir` 대피 폴더에 저장되어 있었던 기존 원본 이미지 파일들을 다시 `uploads/`로 복사 원복
-    5. 복원/롤백 여부와 무관하게 `finally` 구문을 통과해 사용되었던 모든 임시 디스크 경로들을 강제 소멸 삭제
+*   **내보내기 / 다운로드 (`GET /api/backup`)**
+    *   **흐름**: `BackupApiController` ➔ `BackupService` ➔ `DiaryRepository`
+    *   **로직**:
+        1. 임시 작업 폴더(`Files.createTempDirectory`)를 디스크 내에 개설합니다.
+        2. 전체 일기 데이터를 파싱하여 `backup.json` 임시 파일로 변환 저장합니다.
+        3. 로컬 디스크 내의 `uploads/` 폴더 내에 실재하는 이미지 파일들을 `images.zip` 내부 아카이브 압축 파일로 패킹합니다.
+        4. 이 두 임시 결과 파일(`backup.json` + `images.zip`)을 모아서 하나의 단일 ZIP 파일(`diary_backup.zip`)로 병합 압축한 뒤 사용자의 브라우저 다운로드 스트림으로 전송합니다.
+        5. 전송이 완료된 후 임시 디렉토리는 흔적 없이 물리 삭제합니다.
+*   **들여오기 / 복원 및 자동 롤백 (`POST /api/restore`)**
+    *   **흐름**: `BackupApiController` ➔ `BackupService`
+    *   **로직**:
+        1. **안전 장치 마련**: 에러 발생을 감안하여 기존 DB의 데이터 목록과 로컬 `uploads/` 디렉토리 원본 파일들을 임시 백업 메모리 및 임시 디렉토리로 전부 전송 보관(대피)합니다.
+        2. **적재 및 갱신**: 기존 컬렉션을 포맷(`diaryRepository.deleteAll()`)한 후 복원 ZIP에서 압축 해제된 데이터 및 이미지 파일들을 복사해 채워넣습니다.
+        3. **무결성 롤백 구현**: 만약 데이터 삽입 또는 이미지 파일 쓰기 도중 에러가 확인되면 롤백 핸들러가 격발되어 새로 갱신된 데이터를 전부 포맷한 뒤 대피 폴더에 보존 중이던 백업 본원 정보로 복구(Rollback)를 완료해 시스템의 일관성을 항상 보장합니다.
 
 ---
 
 ## 🚀 기동 및 테스트 방법
 
 ### 1. 백엔드 실행
-백엔드 루트 디렉토리(`my-memory-backend`)에서 터미널을 열고 다음 명령어를 입력합니다:
+백엔드 루트 디렉토리(`my-memory-backend`)에서 실행:
 ```bash
 ./gradlew bootRun
 ```
-*백엔드 서버는 `http://localhost:8089` 포트에서 실행되며, 로컬 저장 이미지들을 서빙하기 시작합니다.*
+*백엔드 서버는 `http://localhost:8089` 포트에서 실행됩니다.*
 
 ### 2. 프론트엔드 실행
-프론트엔드 루트 디렉토리(`my-memory-frontend`)에서 패키지를 내려받은 후 개발 모드로 실행합니다:
+프론트엔드 루트 디렉토리(`my-memory-frontend`)에서 패키지 다운로드 및 개발 모드 기동:
 ```bash
 npm install
 npm run dev
 ```
-*프론트엔드 개발 서버는 `http://localhost:5173` 포트에서 가동되며, `/api`와 `/uploads`로 통하는 요청은 Vite 프록시 설정을 따라 백엔드(`8089` 포트)로 우회 공급됩니다.*
+*프론트엔드 개발 서버는 `http://localhost:5173` 포트에서 실행되며, 백엔드(`/api`, `/uploads`) 요청은 Vite 프록시 설정을 통해 백엔드 포트(`8089`)로 자동 유도됩니다.*
+
