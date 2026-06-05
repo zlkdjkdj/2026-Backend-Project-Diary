@@ -1,5 +1,6 @@
 import React from 'react';
 import { type Diary } from '../types/diary';
+import { getImageUrl } from '../api/apiConfig';
 
 interface DiaryItemProps {
   diary: Diary;
@@ -19,7 +20,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
       {diary.imageUrl && (
         <div className="w-full md:w-36 h-48 md:h-28 rounded-xl overflow-hidden border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 flex-shrink-0">
           <img
-            src={diary.imageUrl}
+            src={getImageUrl(diary.imageUrl)}
             alt={diary.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {

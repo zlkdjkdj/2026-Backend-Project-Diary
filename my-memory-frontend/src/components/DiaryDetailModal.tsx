@@ -1,5 +1,6 @@
 import React from 'react';
 import { type Diary } from '../types/diary';
+import { getImageUrl } from '../api/apiConfig';
 
 interface DiaryDetailModalProps {
   diary: Diary | null;
@@ -37,7 +38,7 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
           {diary.imageUrl && (
             <div className="w-full max-h-[550px] rounded-xl overflow-hidden border border-gray-150 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-850 flex items-center justify-center">
               <img
-                src={diary.imageUrl}
+                src={getImageUrl(diary.imageUrl)}
                 alt={diary.title}
                 className="w-full h-full object-contain max-h-[550px]"
                 onError={(e) => {

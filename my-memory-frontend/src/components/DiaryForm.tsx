@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { type Diary } from '../types/diary';
+import { getImageUrl } from '../api/apiConfig';
 
 interface DiaryFormProps {
   initialData?: Diary;
@@ -137,7 +138,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
           {previewUrl && (
             <div className="mt-3 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 h-32 flex items-center justify-center">
               <img
-                src={previewUrl}
+                src={getImageUrl(previewUrl)}
                 alt="미리보기"
                 className="h-full w-full object-cover"
                 onError={(e) => {
