@@ -17,6 +17,12 @@ public class DiaryService {
     private DiaryRepository diaryRepository;
 
     public DiaryForm createDiary(String email, DiaryForm form) {
+        java.time.LocalDate today = form.getCreatedAt() != null ? form.getCreatedAt() : java.time.LocalDate.now();
+        int todayCount = diaryRepository.countByUserIdAndCreatedAt(email, today);
+        if (todayCount >= 3) {
+            throw new RuntimeException("하루에 작성할 수 있는 일기는 최대 3개입니다.");
+        }
+        
         form.setUserId(email);
         DiaryEntity savedDiary = diaryRepository.save(form.toEntity());
         return DiaryForm.fromEntity(savedDiary);
