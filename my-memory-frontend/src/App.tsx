@@ -17,6 +17,7 @@ function App() {
     setToken(null);
     setCurrentUser(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('currentUser');
   };
 

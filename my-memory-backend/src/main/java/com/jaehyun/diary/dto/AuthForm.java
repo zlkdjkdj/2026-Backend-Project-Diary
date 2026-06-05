@@ -28,6 +28,7 @@ public class AuthForm {
     @AllArgsConstructor
     public static class TokenResponse {
         private String token;
+        private String refreshToken;
         private String email;
         private String nickname;
     }

@@ -23,6 +23,7 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string;
+  refreshToken?: string;
   email: string;
   nickname: string;
 }

@@ -31,7 +31,8 @@ const getMockDiaries = (): Diary[] => {
   return JSON.parse(diaries);
 };
 
-// 파일 데이터를 Base64 스트링으로 변환하는 헬퍼 함수
+import { authApi } from './authApi';
+
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -56,6 +57,41 @@ const getMultipartHeaders = () => {
   };
 };
 
+// fetch with automatic token refresh
+const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  let response = await fetch(url, options);
+
+  if (response.status === 401) {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      try {
+        const authData = await authApi.refresh(refreshToken);
+        localStorage.setItem('token', authData.token);
+        if (authData.refreshToken) {
+          localStorage.setItem('refreshToken', authData.refreshToken);
+        }
+
+        // Retry with new token
+        const newHeaders: any = { ...options.headers };
+        if (newHeaders['Authorization']) {
+          newHeaders['Authorization'] = `Bearer ${authData.token}`;
+        }
+        response = await fetch(url, { ...options, headers: newHeaders });
+      } catch (e) {
+        // Refresh failed, clear tokens and let the UI redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+      }
+    } else {
+      // No refresh token available
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  }
+  return response;
+};
+
 export const diaryApi = {
   // Fetch all diaries
   getAll: async (): Promise<Diary[]> => {
@@ -66,7 +102,7 @@ export const diaryApi = {
       return diaries.filter(d => d.userId === userId);
     }
 
-    const response = await fetch(API_BASE, { headers: getHeaders() });
+    const response = await fetchWithAuth(API_BASE, { headers: getHeaders() });
     if (!response.ok) {
       throw new Error('일기 목록을 불러오는 데 실패했습니다.');
     }
@@ -85,7 +121,7 @@ export const diaryApi = {
       );
     }
 
-    const response = await fetch(`${API_BASE}/search?keyword=${encodeURIComponent(keyword)}`, { headers: getHeaders() });
+    const response = await fetchWithAuth(`${API_BASE}/search?keyword=${encodeURIComponent(keyword)}`, { headers: getHeaders() });
     if (!response.ok) {
       throw new Error('일기 검색에 실패했습니다.');
     }
@@ -127,7 +163,7 @@ export const diaryApi = {
       formData.append('image', imageFile);
     }
 
-    const response = await fetch(API_BASE, {
+    const response = await fetchWithAuth(API_BASE, {
       method: 'POST',
       headers: getMultipartHeaders(),
       body: formData,
@@ -178,7 +214,7 @@ export const diaryApi = {
       formData.append('image', imageFile);
     }
 
-    const response = await fetch(`${API_BASE}/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}/${id}`, {
       method: 'PUT',
       headers: getMultipartHeaders(),
       body: formData,
@@ -200,7 +236,7 @@ export const diaryApi = {
       return;
     }
 
-    const response = await fetch(`${API_BASE}/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
     });
@@ -220,7 +256,7 @@ export const diaryApi = {
       return new Blob([dataStr], { type: 'application/json' });
     }
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/backup`, {
+    const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL || ''}/api/backup`, {
       headers: getMultipartHeaders(),
     });
     if (!response.ok) {
@@ -266,7 +302,7 @@ export const diaryApi = {
 
     const formData = new FormData();
     formData.append('file', file);
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/restore`, {
+    const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL || ''}/api/restore`, {
       method: 'POST',
       headers: getMultipartHeaders(),
       body: formData,

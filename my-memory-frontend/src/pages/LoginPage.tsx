@@ -35,6 +35,9 @@ const LoginPage: React.FC<LoginPageProps> = ({
       setToken(response.token);
       setCurrentUser({ email: response.email, nickname: response.nickname });
       localStorage.setItem('token', response.token);
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
       localStorage.setItem('currentUser', JSON.stringify({ email: response.email, nickname: response.nickname }));
       navigate('/');
     } catch (err: any) {
