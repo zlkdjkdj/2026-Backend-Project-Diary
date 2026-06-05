@@ -14,7 +14,11 @@ interface MainPageProps {
   onLogout: () => void;
 }
 
-const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => {
+const MainPage: React.FC<MainPageProps> = ({
+  token,
+  currentUser,
+  onLogout,
+}) => {
   const [diaries, setDiaries] = useState<Diary[]>([]);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -198,8 +202,7 @@ const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => 
   });
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd] text-[#1d1d1f] flex flex-col antialiased">
-      {/* Header */}
+    <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#0b0b0c] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col antialiased">
       <Header
         currentUser={currentUser}
         actionLoading={actionLoading}
@@ -213,8 +216,8 @@ const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => 
         {/* Alerts */}
         {alertMessage && (
           <div
-            className={`fixed top-20 right-8 z-50 px-5 py-3 rounded-xl border shadow-sm flex items-center gap-2.5 transition-all bg-white text-gray-900 ${
-              alertMessage.type === 'success' ? 'border-gray-200' : 'border-red-200'
+            className={`fixed top-20 right-8 z-50 px-5 py-3 rounded-xl border shadow-sm flex items-center gap-2.5 transition-all bg-white text-gray-900 dark:bg-neutral-900 dark:text-neutral-100 dark:border-neutral-800 ${
+              alertMessage.type === 'success' ? 'border-gray-200' : 'border-red-200 dark:border-red-900/50'
             }`}
           >
             <span className="text-xs">{alertMessage.type === 'success' ? '✓' : '✗'}</span>
@@ -224,7 +227,7 @@ const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => 
 
         <div className="max-w-7xl mx-auto w-full space-y-8">
           {/* Centered Diary Form Card */}
-          <div className="max-w-5xl mx-auto w-full">
+          <div className="max-w-7xl mx-auto w-full">
             <DiaryForm
               initialData={editingDiary}
               isEditing={isEditing}
@@ -240,7 +243,7 @@ const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => 
           </div>
 
           {/* Divider and List Section */}
-          <div className="border-t border-gray-200/80 pt-8 space-y-6">
+          <div className="border-t border-gray-200/80 dark:border-neutral-800/80 pt-8 space-y-6">
             {/* Search & Filter Box */}
             <SearchFilter
               searchKeyword={searchKeyword}
@@ -256,16 +259,16 @@ const MainPage: React.FC<MainPageProps> = ({ token, currentUser, onLogout }) => 
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-medium">
+              <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-red-700 dark:text-red-400 text-sm font-medium">
                 ⚠️ {error}
               </div>
             )}
 
             {/* List Header */}
             <div className="flex items-center justify-between">
-              <h3 className="text-gray-950 font-semibold text-base flex items-center gap-2 tracking-tight">
+              <h3 className="text-gray-950 dark:text-white font-semibold text-base flex items-center gap-2 tracking-tight">
                 <span>{currentUser?.nickname}님의 일기 목록</span>
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600">
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
                   {filteredDiaries.length}개
                 </span>
               </h3>

@@ -27,7 +27,10 @@ function App() {
           path="/login"
           element={
             !token ? (
-              <LoginPage setToken={setToken} setCurrentUser={setCurrentUser} />
+              <LoginPage
+                setToken={setToken}
+                setCurrentUser={setCurrentUser}
+              />
             ) : (
               <Navigate to="/" replace />
             )
@@ -47,7 +50,11 @@ function App() {
           path="/"
           element={
             token ? (
-              <MainPage token={token} currentUser={currentUser} onLogout={handleLogout} />
+              <MainPage
+                token={token}
+                currentUser={currentUser}
+                onLogout={handleLogout}
+              />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -60,4 +67,3 @@ function App() {
 }
 
 export default App;
-

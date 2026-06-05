@@ -71,11 +71,11 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-8 md:p-10 shadow-sm">
-      <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 tracking-tight">
+    <div className="bg-white dark:bg-neutral-900 border border-gray-200/80 dark:border-neutral-800/80 rounded-2xl p-8 md:p-10 shadow-sm">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2 tracking-tight">
         <span>{isEditing ? '일기 수정하기' : '새로운 기록'}</span>
         {isEditing && (
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-medium">
+          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-855 text-neutral-600 dark:text-neutral-400 font-medium">
             수정 중
           </span>
         )}
@@ -83,7 +83,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
             날짜
           </label>
           <input
@@ -91,38 +91,13 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             value={createdAt}
             onChange={(e) => setCreatedAt(e.target.value)}
             required
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-405 transition-colors outline-none text-sm"
+            className="w-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 focus:border-black dark:focus:border-white rounded-xl px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 transition-colors outline-none text-sm"
           />
         </div>
 
-        <div>
-          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-            기분
-          </label>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {EMOTIONS.map((emo) => {
-              const isSelected = emotion === emo.name;
-              return (
-                <button
-                  key={emo.name}
-                  type="button"
-                  onClick={() => setEmotion(emo.name)}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all text-xs font-medium cursor-pointer ${
-                    isSelected
-                      ? 'bg-black border-black text-white scale-[1.02] shadow-sm'
-                      : 'bg-white border-gray-250 hover:border-gray-450 text-gray-800'
-                  }`}
-                >
-                  <span className="text-lg">{emo.emoji}</span>
-                  <span className="text-[11px]">{emo.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
             제목
           </label>
           <input
@@ -131,12 +106,12 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="오늘 하루를 요약해보세요"
             required
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors outline-none text-base"
+            className="w-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 focus:border-black dark:focus:border-white rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 transition-colors outline-none text-base"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
             내용
           </label>
           <textarea
@@ -145,22 +120,22 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             placeholder="오늘 하루 어떤 기록을 남기고 싶으신가요?"
             required
             rows={10}
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors outline-none text-base resize-none"
+            className="w-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 focus:border-black dark:focus:border-white rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 transition-colors outline-none text-base resize-none"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
             이미지 (선택)
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="w-full bg-white border border-gray-200 focus:border-black rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 transition-colors outline-none text-sm file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+            className="w-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 focus:border-black dark:focus:border-white rounded-xl px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 transition-colors outline-none text-sm file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-gray-100 dark:file:bg-neutral-700 file:text-gray-700 dark:file:text-neutral-300 hover:file:bg-gray-200 dark:hover:file:bg-neutral-600"
           />
           {previewUrl && (
-            <div className="mt-3 relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 h-32 flex items-center justify-center">
+            <div className="mt-3 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 h-32 flex items-center justify-center">
               <img
                 src={previewUrl}
                 alt="미리보기"
@@ -191,7 +166,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-colors text-sm cursor-pointer"
+              className="flex-1 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-700 dark:text-neutral-300 font-medium py-2.5 px-4 rounded-xl transition-colors text-sm cursor-pointer"
             >
               취소
             </button>
@@ -199,7 +174,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
           <button
             type="submit"
             disabled={actionLoading}
-            className="flex-2 bg-black hover:bg-neutral-800 text-white font-medium py-2.5 px-4 rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50 text-sm cursor-pointer"
+            className="flex-2 bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-black font-medium py-2.5 px-4 rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50 text-sm cursor-pointer"
           >
             {isEditing ? '수정 완료' : '저장하기'}
           </button>
