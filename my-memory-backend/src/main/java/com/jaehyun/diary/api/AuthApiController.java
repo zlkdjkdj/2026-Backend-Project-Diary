@@ -25,14 +25,4 @@ public class AuthApiController {
         AuthForm.TokenResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthForm.TokenResponse> refresh(@RequestHeader("Authorization") String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String refreshToken = authorizationHeader.substring(7);
-        AuthForm.TokenResponse response = authService.refresh(refreshToken);
-        return ResponseEntity.ok(response);
-    }
 }

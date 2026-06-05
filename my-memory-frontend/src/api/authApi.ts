@@ -78,31 +78,6 @@ export const authApi = {
     }
     
     return response.json();
-  },
-
-  refresh: async (refreshToken: string): Promise<AuthResponse> => {
-    if (isMock()) {
-      return {
-        token: `mock-jwt-token-${Date.now()}`,
-        refreshToken: refreshToken,
-        email: 'test@test.com',
-        nickname: '테스터',
-      };
-    }
-
-    const response = await fetch(`${API_BASE}/refresh`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${refreshToken}`
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('리프레시 토큰이 만료되었습니다.');
-    }
-
-    return response.json();
   }
 };
 

@@ -43,23 +43,7 @@ public class AuthService {
         }
 
         String token = jwtUtil.createToken(user.getEmail(), user.getRole().name());
-        String refreshToken = jwtUtil.createRefreshToken(user.getEmail());
         
-        return new AuthForm.TokenResponse(token, refreshToken, user.getEmail(), user.getNickname());
-    }
-
-    public AuthForm.TokenResponse refresh(String refreshToken) {
-        if (!jwtUtil.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않거나 만료된 리프레시 토큰입니다.");
-        }
-
-        String email = jwtUtil.getEmail(refreshToken);
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        String newToken = jwtUtil.createToken(user.getEmail(), user.getRole().name());
-        String newRefreshToken = jwtUtil.createRefreshToken(user.getEmail());
-
-        return new AuthForm.TokenResponse(newToken, newRefreshToken, user.getEmail(), user.getNickname());
+        return new AuthForm.TokenResponse(token, user.getEmail(), user.getNickname());
     }
 }

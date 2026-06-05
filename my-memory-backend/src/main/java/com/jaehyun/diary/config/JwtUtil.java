@@ -38,21 +38,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String createRefreshToken(String email) {
-        Claims claims = Jwts.claims();
-        claims.put("email", email);
-
-        // 7 days expiration for refresh token
-        long refreshExpirationTime = 7L * 24 * 60 * 60 * 1000;
-        
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationTime))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
     public String getEmail(String token) {
         return parseClaims(token).get("email", String.class);
     }
