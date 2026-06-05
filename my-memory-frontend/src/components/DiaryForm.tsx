@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EMOTIONS, type Diary } from '../types/diary';
+import { type Diary } from '../types/diary';
 
 interface DiaryFormProps {
   initialData?: Diary;
@@ -18,7 +18,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 }) => {
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
-  const [emotion, setEmotion] = useState(initialData?.emotion || 'Happy');
+
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
   const [createdAt, setCreatedAt] = useState(
     initialData?.createdAt || new Date().toISOString().split('T')[0]
@@ -30,7 +30,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
     if (initialData) {
       setTitle(initialData.title);
       setContent(initialData.content);
-      setEmotion(initialData.emotion);
+
       setImageUrl(initialData.imageUrl || '');
       setPreviewUrl(initialData.imageUrl || '');
       setCreatedAt(initialData.createdAt || new Date().toISOString().split('T')[0]);
@@ -38,7 +38,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
     } else {
       setTitle('');
       setContent('');
-      setEmotion('Happy');
+
       setImageUrl('');
       setPreviewUrl('');
       setCreatedAt(new Date().toISOString().split('T')[0]);
@@ -64,7 +64,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
       userId: '', // 백엔드에서 인증 토큰으로 처리됨
       title,
       content,
-      emotion,
+      emotion: 'Happy', // 기분 기능 삭제로 인한 기본값 고정
       imageUrl: imageUrl.trim() ? imageUrl : undefined,
       createdAt,
     }, imageFile);

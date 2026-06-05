@@ -13,7 +13,7 @@ const getMockDiaries = (): Diary[] => {
         userId: 'test@test.com',
         title: '오늘의 일기: 평온한 카페 투어',
         content: '동네에 새로 생긴 예쁜 북카페에 다녀왔다. 조용한 음악이 흐르고 커피 맛도 훌륭해서 앞으로 자주 방문하게 될 것 같다. 밀린 독서도 조금 하고 머리를 식힐 수 있었던 소중한 시간이었다.',
-        emotion: 'Calm',
+        emotion: 'Happy',
         createdAt: new Date().toISOString().split('T')[0],
       },
       {
@@ -21,7 +21,7 @@ const getMockDiaries = (): Diary[] => {
         userId: 'test@test.com',
         title: '신나는 코딩 공부!',
         content: '백엔드 없이 프론트엔드를 완벽하게 모사하는 Mock API를 구현했다. 생각보다 자연스럽게 잘 작동해서 신기하고 재미있었다. 앞으로 시연할 때 정말 큰 도움이 될 것 같다!',
-        emotion: 'Excited',
+        emotion: 'Happy',
         createdAt: new Date().toISOString().split('T')[0],
       }
     ];

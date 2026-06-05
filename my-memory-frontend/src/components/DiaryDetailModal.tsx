@@ -1,5 +1,5 @@
 import React from 'react';
-import { EMOTIONS, type Diary } from '../types/diary';
+import { type Diary } from '../types/diary';
 
 interface DiaryDetailModalProps {
   diary: Diary | null;
@@ -9,10 +9,7 @@ interface DiaryDetailModalProps {
 const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) => {
   if (!diary) return null;
 
-  const emo = EMOTIONS.find((e) => e.name === diary.emotion) || {
-    emoji: '📝',
-    label: diary.emotion,
-  };
+
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">

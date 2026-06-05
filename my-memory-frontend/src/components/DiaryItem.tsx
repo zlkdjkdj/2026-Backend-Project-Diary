@@ -1,5 +1,5 @@
 import React from 'react';
-import { EMOTIONS, type Diary } from '../types/diary';
+import { type Diary } from '../types/diary';
 
 interface DiaryItemProps {
   diary: Diary;
@@ -9,11 +9,7 @@ interface DiaryItemProps {
 }
 
 const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }) => {
-  const emo = EMOTIONS.find((e) => e.name === diary.emotion) || {
-    emoji: '📝',
-    color: 'slate',
-    label: diary.emotion,
-  };
+
 
   return (
     <div 
