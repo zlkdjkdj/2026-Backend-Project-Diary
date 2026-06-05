@@ -1,7 +1,7 @@
 import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/diary';
 import { isMock } from './apiConfig';
 
-const API_BASE = '/api/auth';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/auth` : '/api/auth';
 
 // 초기 Mock 유저 설정
 const getMockUsers = (): Array<RegisterRequest & { nickname: string }> => {

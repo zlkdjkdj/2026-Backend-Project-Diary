@@ -1,7 +1,7 @@
 import type { Diary } from '../types/diary';
 import { isMock, getCurrentUserId } from './apiConfig';
 
-const API_BASE = '/api/diary';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/diary` : '/api/diary';
 
 // 초기 다이어리 데이터 설정
 const getMockDiaries = (): Diary[] => {
@@ -220,7 +220,7 @@ export const diaryApi = {
       return new Blob([dataStr], { type: 'application/json' });
     }
 
-    const response = await fetch('/api/backup', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/backup`, {
       headers: getMultipartHeaders(),
     });
     if (!response.ok) {
@@ -266,7 +266,7 @@ export const diaryApi = {
 
     const formData = new FormData();
     formData.append('file', file);
-    const response = await fetch('/api/restore', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/restore`, {
       method: 'POST',
       headers: getMultipartHeaders(),
       body: formData,
