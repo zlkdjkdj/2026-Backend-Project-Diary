@@ -11,36 +11,36 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiaryForm {
-    private String id;
-    private String userId;
-    private String title;
-    private String content;
-    private String emotion;
-    private String imageUrl;
-    private LocalDate createdAt;
+    private String diaryId;
+    private String authorEmail;
+    private String diaryTitle;
+    private String diaryContent;
+    private String selectedEmotion;
+    private String attachedPhotoUrl;
+    private LocalDate writtenDate;
 
     public DiaryEntity toEntity() {
         DiaryEntity entity = new DiaryEntity();
-        entity.setId(this.id);
-        entity.setUserId(this.userId);
-        entity.setTitle(this.title);
-        entity.setContent(this.content);
-        entity.setEmotion(this.emotion);
-        entity.setImageUrl(this.imageUrl);
-        entity.setCreatedAt(this.createdAt == null ? LocalDate.now() : this.createdAt);
+        entity.setDiaryId(this.diaryId);
+        entity.setAuthorEmail(this.authorEmail);
+        entity.setDiaryTitle(this.diaryTitle);
+        entity.setDiaryContent(this.diaryContent);
+        entity.setSelectedEmotion(this.selectedEmotion);
+        entity.setAttachedPhotoUrl(this.attachedPhotoUrl);
+        entity.setWrittenDate(this.writtenDate == null ? LocalDate.now() : this.writtenDate);
         return entity;
     }
 
     public static DiaryForm fromEntity(DiaryEntity entity) {
         if (entity == null) return null;
         return new DiaryForm(
-                entity.getId(),
-                entity.getUserId(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getEmotion(),
-                entity.getImageUrl(),
-                entity.getCreatedAt()
+                entity.getDiaryId(),
+                entity.getAuthorEmail(),
+                entity.getDiaryTitle(),
+                entity.getDiaryContent(),
+                entity.getSelectedEmotion(),
+                entity.getAttachedPhotoUrl(),
+                entity.getWrittenDate()
         );
     }
 }

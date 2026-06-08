@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface DiaryRepository extends MongoRepository<DiaryEntity, String> {
-    List<DiaryEntity> findByUserId(String userId);
-    List<DiaryEntity> findByUserIdAndContentContaining(String userId, String content);
-    int countByUserIdAndCreatedAt(String userId, java.time.LocalDate createdAt);
+    List<DiaryEntity> findByAuthorEmail(String authorEmail);
+    List<DiaryEntity> findByAuthorEmailAndDiaryContentContaining(String authorEmail, String diaryContent);
+    int countByAuthorEmailAndWrittenDate(String authorEmail, java.time.LocalDate writtenDate);
 }

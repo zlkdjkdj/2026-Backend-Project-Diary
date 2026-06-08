@@ -14,9 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class UserEntity {
     @Id
-    private String id;
-    private String email;
-    private String password;
-    private String nickname;
-    private UserRole role;
+    private String userId;
+    private String userEmail;
+    private String encryptedPassword;
+    private String userNickname;
+    private UserRole userRole;
 }

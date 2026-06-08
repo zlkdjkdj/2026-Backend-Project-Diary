@@ -10,25 +10,25 @@ public class AuthForm {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginForm {
-        private String email;
-        private String password;
+        private String userEmail;
+        private String rawPassword;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterForm {
-        private String email;
-        private String password;
-        private String nickname;
+        private String userEmail;
+        private String rawPassword;
+        private String userNickname;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TokenResponse {
-        private String token;
-        private String email;
-        private String nickname;
+        private String accessToken;
+        private String userEmail;
+        private String userNickname;
     }
 }

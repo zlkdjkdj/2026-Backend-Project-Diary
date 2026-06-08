@@ -1,29 +1,29 @@
 export interface Diary {
-  id?: string;
-  userId: string;
-  title: string;
-  content: string;
-  emotion: string;
-  imageUrl?: string;
-  createdAt?: string; // YYYY-MM-DD
+  diaryId?: string;
+  authorEmail: string;
+  diaryTitle: string;
+  diaryContent: string;
+  selectedEmotion: string;
+  attachedPhotoUrl?: string;
+  writtenDate?: string; // YYYY-MM-DD
 }
 
 
 
 export interface LoginRequest {
-  email: string;
-  password?: string;
+  userEmail: string;
+  rawPassword?: string;
 }
 
 export interface RegisterRequest {
-  email: string;
-  password?: string;
-  nickname: string;
+  userEmail: string;
+  rawPassword?: string;
+  userNickname: string;
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   refreshToken?: string;
-  email: string;
-  nickname: string;
+  userEmail: string;
+  userNickname: string;
 }

@@ -10,11 +10,11 @@ import java.time.LocalDate;
 @Document(collection = "diary")
 public class DiaryEntity {
     @Id
-    private String id;
-    private String userId;
-    private String title;
-    private String content;
-    private String emotion;
-    private String imageUrl;
-    private LocalDate createdAt;
+    private String diaryId;
+    private String authorEmail;
+    private String diaryTitle;
+    private String diaryContent;
+    private String selectedEmotion;
+    private String attachedPhotoUrl;
+    private LocalDate writtenDate;
 }

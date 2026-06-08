@@ -17,11 +17,11 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
       onClick={() => onView(diary)}
       className="group bg-white dark:bg-neutral-900 border border-gray-200/80 dark:border-neutral-800 rounded-2xl p-5 transition-all duration-300 hover:shadow-sm hover:translate-y-[-1px] flex flex-col md:flex-row gap-5 cursor-pointer"
     >
-      {diary.imageUrl && (
+      {diary.attachedPhotoUrl && (
         <div className="w-full md:w-36 h-48 md:h-28 rounded-xl overflow-hidden border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 flex-shrink-0">
           <img
-            src={getImageUrl(diary.imageUrl)}
-            alt={diary.title}
+            src={getImageUrl(diary.attachedPhotoUrl)}
+            alt={diary.diaryTitle}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
@@ -35,10 +35,10 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
           {/* Card Header info */}
           <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium">{diary.userId}</span>
+              <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium">{diary.authorEmail}</span>
               <span className="text-xs text-gray-300 dark:text-neutral-700 font-medium">|</span>
               <span className="text-xs text-gray-400 dark:text-neutral-500 font-medium">
-                {diary.createdAt || '날짜 없음'}
+                {diary.writtenDate || '날짜 없음'}
               </span>
             </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -55,7 +55,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  diary.id && onDelete(diary.id);
+                  diary.diaryId && onDelete(diary.diaryId);
                 }}
                 className="p-1.5 rounded-lg text-gray-400 dark:text-neutral-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all cursor-pointer"
                 title="삭제"
@@ -66,11 +66,11 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
           </div>
           {/* Title */}
           <h4 className="text-gray-900 dark:text-white font-semibold text-base mb-1.5 transition-colors">
-            {diary.title}
+            {diary.diaryTitle}
           </h4>
           {/* Content */}
           <p className="text-gray-600 dark:text-neutral-300 text-sm leading-relaxed line-clamp-2 overflow-hidden text-ellipsis whitespace-pre-wrap">
-            {diary.content}
+            {diary.diaryContent}
           </p>
         </div>
       </div>

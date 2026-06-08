@@ -24,13 +24,13 @@ public class DiaryApiController {
     @PostMapping
     public DiaryForm createDiary(
             Principal principal,
-            @RequestPart("diary") DiaryForm diaryForm,
-            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = fileService.saveFile(image);
-            diaryForm.setImageUrl(imageUrl);
+            @RequestPart("diary") DiaryForm diaryInputData,
+            @RequestPart(value = "image", required = false) MultipartFile diaryImageFile) throws IOException {
+        if (diaryImageFile != null && !diaryImageFile.isEmpty()) {
+            String imageUrl = fileService.saveFile(diaryImageFile);
+            diaryInputData.setAttachedPhotoUrl(imageUrl);
         }
-        return diaryService.createDiary(principal.getName(), diaryForm);
+        return diaryService.createDiary(principal.getName(), diaryInputData);
     }
 
     @GetMapping
@@ -39,21 +39,21 @@ public class DiaryApiController {
     }
 
     @GetMapping("/search")
-    public List<DiaryForm> searchDiaries(Principal principal, @RequestParam("keyword") String keyword) {
-        return diaryService.searchDiaries(principal.getName(), keyword);
+    public List<DiaryForm> searchDiaries(Principal principal, @RequestParam("keyword") String searchKeyword) {
+        return diaryService.searchDiaries(principal.getName(), searchKeyword);
     }
 
     @PutMapping("/{id}")
     public DiaryForm updateDiary(
             Principal principal,
             @PathVariable("id") String id,
-            @RequestPart("diary") DiaryForm diaryForm,
-            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = fileService.saveFile(image);
-            diaryForm.setImageUrl(imageUrl);
+            @RequestPart("diary") DiaryForm diaryInputData,
+            @RequestPart(value = "image", required = false) MultipartFile diaryImageFile) throws IOException {
+        if (diaryImageFile != null && !diaryImageFile.isEmpty()) {
+            String imageUrl = fileService.saveFile(diaryImageFile);
+            diaryInputData.setAttachedPhotoUrl(imageUrl);
         }
-        return diaryService.updateDiary(principal.getName(), id, diaryForm);
+        return diaryService.updateDiary(principal.getName(), id, diaryInputData);
     }
 
     @DeleteMapping("/{id}")

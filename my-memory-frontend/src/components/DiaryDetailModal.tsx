@@ -20,7 +20,7 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
           <div className="flex items-center gap-2.5">
             <div>
               <span className="text-[11px] font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider block">
-                {diary.createdAt || '날짜 없음'}
+                {diary.writtenDate || '날짜 없음'}
               </span>
             </div>
           </div>
@@ -35,11 +35,11 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
         {/* Modal Body */}
         <div className="p-6 space-y-6">
           {/* Large Image */}
-          {diary.imageUrl && (
+          {diary.attachedPhotoUrl && (
             <div className="w-full max-h-[550px] rounded-xl overflow-hidden border border-gray-150 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-850 flex items-center justify-center">
               <img
-                src={getImageUrl(diary.imageUrl)}
-                alt={diary.title}
+                src={getImageUrl(diary.attachedPhotoUrl)}
+                alt={diary.diaryTitle}
                 className="w-full h-full object-contain max-h-[550px]"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
@@ -51,10 +51,10 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
           {/* Title and Content */}
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-gray-950 dark:text-white tracking-tight leading-snug">
-              {diary.title}
+              {diary.diaryTitle}
             </h2>
             <p className="text-gray-700 dark:text-neutral-300 text-sm leading-relaxed whitespace-pre-line border-t border-gray-50 dark:border-neutral-800 pt-4">
-              {diary.content}
+              {diary.diaryContent}
             </p>
           </div>
         </div>

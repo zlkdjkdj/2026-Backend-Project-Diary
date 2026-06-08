@@ -9,20 +9,20 @@ const getMockDiaries = (): Diary[] => {
   if (!diaries) {
     const defaultDiaries: Diary[] = [
       {
-        id: 'mock-diary-1',
-        userId: 'test@test.com',
-        title: '오늘의 일기: 평온한 카페 투어',
-        content: '동네에 새로 생긴 예쁜 북카페에 다녀왔다. 조용한 음악이 흐르고 커피 맛도 훌륭해서 앞으로 자주 방문하게 될 것 같다. 밀린 독서도 조금 하고 머리를 식힐 수 있었던 소중한 시간이었다.',
-        emotion: 'Happy',
-        createdAt: new Date().toISOString().split('T')[0],
+        diaryId: 'mock-diary-1',
+        authorEmail: 'test@test.com',
+        diaryTitle: '오늘의 일기: 평온한 카페 투어',
+        diaryContent: '동네에 새로 생긴 예쁜 북카페에 다녀왔다. 조용한 음악이 흐르고 커피 맛도 훌륭해서 앞으로 자주 방문하게 될 것 같다. 밀린 독서도 조금 하고 머리를 식힐 수 있었던 소중한 시간이었다.',
+        selectedEmotion: 'Happy',
+        writtenDate: new Date().toISOString().split('T')[0],
       },
       {
-        id: 'mock-diary-2',
-        userId: 'test@test.com',
-        title: '신나는 코딩 공부!',
-        content: '백엔드 없이 프론트엔드를 완벽하게 모사하는 Mock API를 구현했다. 생각보다 자연스럽게 잘 작동해서 신기하고 재미있었다. 앞으로 시연할 때 정말 큰 도움이 될 것 같다!',
-        emotion: 'Happy',
-        createdAt: new Date().toISOString().split('T')[0],
+        diaryId: 'mock-diary-2',
+        authorEmail: 'test@test.com',
+        diaryTitle: '신나는 코딩 공부!',
+        diaryContent: '백엔드 없이 프론트엔드를 완벽하게 모사하는 Mock API를 구현했다. 생각보다 자연스럽게 잘 작동해서 신기하고 재미있었다. 앞으로 시연할 때 정말 큰 도움이 될 것 같다!',
+        selectedEmotion: 'Happy',
+        writtenDate: new Date().toISOString().split('T')[0],
       }
     ];
     localStorage.setItem('mock_diaries', JSON.stringify(defaultDiaries));
@@ -63,7 +63,7 @@ export const diaryApi = {
       await new Promise(resolve => setTimeout(resolve, 300));
       const userId = getCurrentUserId();
       const diaries = getMockDiaries();
-      return diaries.filter(d => d.userId === userId);
+      return diaries.filter(d => d.authorEmail === userId);
     }
 
     const response = await fetch(API_BASE, { headers: getHeaders() });
@@ -80,8 +80,8 @@ export const diaryApi = {
       const userId = getCurrentUserId();
       const diaries = getMockDiaries();
       return diaries.filter(d => 
-        d.userId === userId && 
-        (d.title.includes(keyword) || d.content.includes(keyword))
+        d.authorEmail === userId && 
+        (d.diaryTitle.includes(keyword) || d.diaryContent.includes(keyword))
       );
     }
 
@@ -110,10 +110,10 @@ export const diaryApi = {
       
       const newDiary: Diary = {
         ...diary,
-        id: `mock-diary-${Date.now()}`,
-        userId,
-        imageUrl,
-        createdAt: diary.createdAt || new Date().toISOString().split('T')[0]
+        diaryId: `mock-diary-${Date.now()}`,
+        authorEmail: userId,
+        attachedPhotoUrl: imageUrl,
+        writtenDate: diary.writtenDate || new Date().toISOString().split('T')[0]
       };
       
       diaries.unshift(newDiary);
@@ -144,13 +144,13 @@ export const diaryApi = {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 600));
       const diaries = getMockDiaries();
-      const index = diaries.findIndex(d => d.id === id);
+      const index = diaries.findIndex(d => d.diaryId === id);
       
       if (index === -1) {
         throw new Error('해당 일기를 찾을 수 없습니다.');
       }
       
-      let imageUrl = diaries[index].imageUrl;
+      let imageUrl = diaries[index].attachedPhotoUrl;
       if (imageFile) {
         try {
           imageUrl = await fileToBase64(imageFile);
@@ -164,7 +164,7 @@ export const diaryApi = {
       const updatedDiary: Diary = {
         ...diaries[index],
         ...diary,
-        imageUrl,
+        attachedPhotoUrl: imageUrl,
       };
       
       diaries[index] = updatedDiary;
@@ -195,7 +195,7 @@ export const diaryApi = {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 400));
       const diaries = getMockDiaries();
-      const filtered = diaries.filter(d => d.id !== id);
+      const filtered = diaries.filter(d => d.diaryId !== id);
       localStorage.setItem('mock_diaries', JSON.stringify(filtered));
       return;
     }
@@ -215,7 +215,7 @@ export const diaryApi = {
       await new Promise(resolve => setTimeout(resolve, 500));
       const diaries = getMockDiaries();
       const userId = getCurrentUserId();
-      const userDiaries = diaries.filter(d => d.userId === userId);
+      const userDiaries = diaries.filter(d => d.authorEmail === userId);
       const dataStr = JSON.stringify(userDiaries, null, 2);
       return new Blob([dataStr], { type: 'application/json' });
     }
@@ -245,12 +245,12 @@ export const diaryApi = {
             
             const diaries = getMockDiaries();
             const userId = getCurrentUserId();
-            const otherUsersDiaries = diaries.filter(d => d.userId !== userId);
+            const otherUsersDiaries = diaries.filter(d => d.authorEmail !== userId);
             
             const processedRestored = restoredDiaries.map((d: any) => ({
               ...d,
-              userId: userId,
-              id: d.id || `mock-diary-${Math.random().toString(36).substr(2, 9)}`,
+              authorEmail: userId,
+              diaryId: d.diaryId || `mock-diary-${Math.random().toString(36).substr(2, 9)}`,
             }));
             
             const merged = [...processedRestored, ...otherUsersDiaries];

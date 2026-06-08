@@ -26,12 +26,12 @@ public class BackupApiController {
     }
 
     @PostMapping("/restore")
-    public ResponseEntity<String> restoreBackup(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
+    public ResponseEntity<String> restoreBackup(@RequestParam("file") MultipartFile backupZipFile) {
+        if (backupZipFile.isEmpty()) {
             return ResponseEntity.badRequest().body("파일이 존재하지 않거나 비어 있습니다.");
         }
         try {
-            backupService.restoreBackup(file.getInputStream());
+            backupService.restoreBackup(backupZipFile.getInputStream());
             return ResponseEntity.ok("백업 데이터가 성공적으로 복원되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("백업 복원 중 오류가 발생했습니다: " + e.getMessage());

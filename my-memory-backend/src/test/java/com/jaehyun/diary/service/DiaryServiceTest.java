@@ -30,22 +30,22 @@ class DiaryServiceTest {
         String diaryId = "diary123";
         
         DiaryEntity existingDiary = new DiaryEntity();
-        existingDiary.setId(diaryId);
-        existingDiary.setUserId(email);
-        existingDiary.setTitle("Old Title");
-        existingDiary.setContent("Old Content");
-        existingDiary.setCreatedAt(LocalDate.now());
+        existingDiary.setDiaryId(diaryId);
+        existingDiary.setAuthorEmail(email);
+        existingDiary.setDiaryTitle("Old Title");
+        existingDiary.setDiaryContent("Old Content");
+        existingDiary.setWrittenDate(LocalDate.now());
 
         DiaryForm updateForm = new DiaryForm();
-        updateForm.setTitle("New Title");
-        updateForm.setContent("New Content");
+        updateForm.setDiaryTitle("New Title");
+        updateForm.setDiaryContent("New Content");
 
         DiaryEntity updatedEntity = new DiaryEntity();
-        updatedEntity.setId(diaryId);
-        updatedEntity.setUserId(email);
-        updatedEntity.setTitle("New Title");
-        updatedEntity.setContent("New Content");
-        updatedEntity.setCreatedAt(LocalDate.now());
+        updatedEntity.setDiaryId(diaryId);
+        updatedEntity.setAuthorEmail(email);
+        updatedEntity.setDiaryTitle("New Title");
+        updatedEntity.setDiaryContent("New Content");
+        updatedEntity.setWrittenDate(LocalDate.now());
 
         when(diaryRepository.findById(diaryId)).thenReturn(Optional.of(existingDiary));
         when(diaryRepository.save(any(DiaryEntity.class))).thenReturn(updatedEntity);
@@ -55,8 +55,8 @@ class DiaryServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("New Title", result.getTitle());
-        assertEquals("New Content", result.getContent());
+        assertEquals("New Title", result.getDiaryTitle());
+        assertEquals("New Content", result.getDiaryContent());
         verify(diaryRepository, times(1)).findById(diaryId);
         verify(diaryRepository, times(1)).save(any(DiaryEntity.class));
     }
@@ -68,14 +68,14 @@ class DiaryServiceTest {
         String diaryId = "diary123";
         
         DiaryEntity existingDiary = new DiaryEntity();
-        existingDiary.setId(diaryId);
-        existingDiary.setUserId("owner@test.com"); // mismatch
-        existingDiary.setTitle("Old Title");
-        existingDiary.setContent("Old Content");
+        existingDiary.setDiaryId(diaryId);
+        existingDiary.setAuthorEmail("owner@test.com"); // mismatch
+        existingDiary.setDiaryTitle("Old Title");
+        existingDiary.setDiaryContent("Old Content");
 
         DiaryForm updateForm = new DiaryForm();
-        updateForm.setTitle("New Title");
-        updateForm.setContent("New Content");
+        updateForm.setDiaryTitle("New Title");
+        updateForm.setDiaryContent("New Content");
 
         when(diaryRepository.findById(diaryId)).thenReturn(Optional.of(existingDiary));
 
@@ -96,8 +96,8 @@ class DiaryServiceTest {
         String diaryId = "diary123";
         
         DiaryEntity existingDiary = new DiaryEntity();
-        existingDiary.setId(diaryId);
-        existingDiary.setUserId(email);
+        existingDiary.setDiaryId(diaryId);
+        existingDiary.setAuthorEmail(email);
 
         when(diaryRepository.findById(diaryId)).thenReturn(Optional.of(existingDiary));
         doNothing().when(diaryRepository).deleteById(diaryId);

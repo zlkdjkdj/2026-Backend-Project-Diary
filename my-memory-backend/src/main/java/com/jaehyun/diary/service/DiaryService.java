@@ -16,35 +16,35 @@ public class DiaryService {
     @Autowired
     private DiaryRepository diaryRepository;
 
-    public DiaryForm createDiary(String email, DiaryForm form) {
-        java.time.LocalDate today = form.getCreatedAt() != null ? form.getCreatedAt() : java.time.LocalDate.now();
-        int todayCount = diaryRepository.countByUserIdAndCreatedAt(email, today);
+    public DiaryForm createDiary(String email, DiaryForm diaryInputData) {
+        java.time.LocalDate today = diaryInputData.getWrittenDate() != null ? diaryInputData.getWrittenDate() : java.time.LocalDate.now();
+        int todayCount = diaryRepository.countByAuthorEmailAndWrittenDate(email, today);
         if (todayCount >= 3) {
             throw new RuntimeException("하루에 작성할 수 있는 일기는 최대 3개입니다.");
         }
         
-        form.setUserId(email);
-        DiaryEntity savedDiary = diaryRepository.save(form.toEntity());
+        diaryInputData.setAuthorEmail(email);
+        DiaryEntity savedDiary = diaryRepository.save(diaryInputData.toEntity());
         return DiaryForm.fromEntity(savedDiary);
     }
 
     public List<DiaryForm> getAllDiaries(String email) {
-        return diaryRepository.findByUserId(email).stream()
+        return diaryRepository.findByAuthorEmail(email).stream()
                 .map(DiaryForm::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public List<DiaryForm> searchDiaries(String email, String keyword) {
-        return diaryRepository.findByUserIdAndContentContaining(email, keyword).stream()
+    public List<DiaryForm> searchDiaries(String email, String searchKeyword) {
+        return diaryRepository.findByAuthorEmailAndDiaryContentContaining(email, searchKeyword).stream()
                 .map(DiaryForm::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @CheckOwnership
-    public DiaryForm updateDiary(String email, String id, DiaryForm form) {
-        form.setUserId(email);
-        DiaryEntity updatedDiary = form.toEntity();
-        updatedDiary.setId(id);
+    public DiaryForm updateDiary(String email, String id, DiaryForm diaryInputData) {
+        diaryInputData.setAuthorEmail(email);
+        DiaryEntity updatedDiary = diaryInputData.toEntity();
+        updatedDiary.setDiaryId(id);
         return DiaryForm.fromEntity(diaryRepository.save(updatedDiary));
     }
 

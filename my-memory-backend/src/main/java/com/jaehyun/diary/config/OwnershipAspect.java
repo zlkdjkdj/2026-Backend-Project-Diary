@@ -19,7 +19,7 @@ public class OwnershipAspect {
     public void verifyOwnership(JoinPoint joinPoint, String email, String id) {
         DiaryEntity diary = diaryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("일기가 존재하지 않습니다. ID: " + id));
-        if (!diary.getUserId().equals(email)) {
+        if (!diary.getAuthorEmail().equals(email)) {
             throw new IllegalArgumentException("권한이 없습니다.");
         }
     }

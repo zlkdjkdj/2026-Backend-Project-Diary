@@ -17,24 +17,24 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   onCancel,
   actionLoading,
 }) => {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [content, setContent] = useState(initialData?.content || '');
+  const [title, setTitle] = useState(initialData?.diaryTitle || '');
+  const [content, setContent] = useState(initialData?.diaryContent || '');
 
-  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
+  const [imageUrl, setImageUrl] = useState(initialData?.attachedPhotoUrl || '');
   const [createdAt, setCreatedAt] = useState(
-    initialData?.createdAt || new Date().toISOString().split('T')[0]
+    initialData?.writtenDate || new Date().toISOString().split('T')[0]
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
-      setTitle(initialData.title);
-      setContent(initialData.content);
+      setTitle(initialData.diaryTitle);
+      setContent(initialData.diaryContent);
 
-      setImageUrl(initialData.imageUrl || '');
-      setPreviewUrl(initialData.imageUrl || '');
-      setCreatedAt(initialData.createdAt || new Date().toISOString().split('T')[0]);
+      setImageUrl(initialData.attachedPhotoUrl || '');
+      setPreviewUrl(initialData.attachedPhotoUrl || '');
+      setCreatedAt(initialData.writtenDate || new Date().toISOString().split('T')[0]);
       setImageFile(null);
     } else {
       setTitle('');
@@ -62,12 +62,12 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
       return;
     }
     onSubmit({
-      userId: '', // 백엔드에서 인증 토큰으로 처리됨
-      title,
-      content,
-      emotion: 'Happy', // 기분 기능 삭제로 인한 기본값 고정
-      imageUrl: imageUrl.trim() ? imageUrl : undefined,
-      createdAt,
+      authorEmail: '', // 백엔드에서 인증 토큰으로 처리됨
+      diaryTitle: title,
+      diaryContent: content,
+      selectedEmotion: 'Happy', // 기분 기능 삭제로 인한 기본값 고정
+      attachedPhotoUrl: imageUrl.trim() ? imageUrl : undefined,
+      writtenDate: createdAt,
     }, imageFile);
   };
 

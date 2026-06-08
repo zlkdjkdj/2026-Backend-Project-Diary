@@ -19,31 +19,31 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public void register(AuthForm.RegisterForm request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+    public void register(AuthForm.RegisterForm registrationRequest) {
+        if (userRepository.existsByUserEmail(registrationRequest.getUserEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
         UserEntity user = UserEntity.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
-                .role(UserRole.USER)
+                .userEmail(registrationRequest.getUserEmail())
+                .encryptedPassword(passwordEncoder.encode(registrationRequest.getRawPassword()))
+                .userNickname(registrationRequest.getUserNickname())
+                .userRole(UserRole.USER)
                 .build();
 
         userRepository.save(user);
     }
 
-    public AuthForm.TokenResponse login(AuthForm.LoginForm request) {
-        UserEntity user = userRepository.findByEmail(request.getEmail())
+    public AuthForm.TokenResponse login(AuthForm.LoginForm loginRequest) {
+        UserEntity user = userRepository.findByUserEmail(loginRequest.getUserEmail())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getRawPassword(), user.getEncryptedPassword())) {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
 
-        String token = jwtUtil.createToken(user.getEmail(), user.getRole().name());
+        String token = jwtUtil.createToken(user.getUserEmail(), user.getUserRole().name());
         
-        return new AuthForm.TokenResponse(token, user.getEmail(), user.getNickname());
+        return new AuthForm.TokenResponse(token, user.getUserEmail(), user.getUserNickname());
     }
 }
