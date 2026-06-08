@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,6 @@ public class JoinService {
                 .role(role)
                 .build();
  
-        userRepository.save(java.util.Objects.requireNonNull(user));
+        userRepository.save(Objects.requireNonNull(user));
     }
 }

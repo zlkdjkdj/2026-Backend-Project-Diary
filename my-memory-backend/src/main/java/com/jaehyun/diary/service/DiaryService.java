@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Service
 public class DiaryService {
@@ -17,7 +18,7 @@ public class DiaryService {
     private DiaryRepository diaryRepository;
 
     public DiaryForm createDiary(String email, DiaryForm diaryInputData) {
-        java.time.LocalDate today = diaryInputData.getWrittenDate() != null ? diaryInputData.getWrittenDate() : java.time.LocalDate.now();
+        LocalDate today = diaryInputData.getWrittenDate() != null ? diaryInputData.getWrittenDate() : LocalDate.now();
         int todayCount = diaryRepository.countByAuthorEmailAndWrittenDate(email, today);
         if (todayCount >= 3) {
             throw new RuntimeException("하루에 작성할 수 있는 일기는 최대 3개입니다.");

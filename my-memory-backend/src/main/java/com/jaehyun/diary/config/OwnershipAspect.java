@@ -15,7 +15,7 @@ public class OwnershipAspect {
     @Autowired
     private DiaryRepository diaryRepository;
 
-    @Before("@annotation(com.jaehyun.diary.config.CheckOwnership) && args(email, id, ..)")
+    @Before("@annotation(CheckOwnership) && args(email, id, ..)")
     public void verifyOwnership(JoinPoint joinPoint, String email, String id) {
         DiaryEntity diary = diaryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("일기가 존재하지 않습니다. ID: " + id));
