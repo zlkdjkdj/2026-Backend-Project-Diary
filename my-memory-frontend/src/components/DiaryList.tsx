@@ -24,7 +24,7 @@ const DiaryList: React.FC<DiaryListProps> = ({ diaries, fetchLoading, onEdit, on
   return (
     <div className="space-y-4">
       {diaries.map((diary) => (
-        <DiaryItem key={diary.id} diary={diary} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+        <DiaryItem key={diary.diaryId} diary={diary} onEdit={onEdit} onDelete={onDelete} onView={onView} />
       ))}
     </div>
   );

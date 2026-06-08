@@ -70,8 +70,8 @@ const MainPage: React.FC<MainPageProps> = ({
     if (!token) return;
     setActionLoading(true);
     try {
-      if (isEditing && diary.id) {
-        await diaryApi.update(diary.id, diary, imageFile);
+      if (isEditing && diary.diaryId) {
+        await diaryApi.update(diary.diaryId, diary, imageFile);
         showAlert('일기가 정상적으로 수정되었습니다!');
       } else {
         await diaryApi.create(diary, imageFile);
@@ -97,7 +97,7 @@ const MainPage: React.FC<MainPageProps> = ({
       await diaryApi.delete(id);
       showAlert('일기가 성공적으로 삭제되었습니다.');
       fetchDiaries();
-      if (isEditing && editingDiary?.id === id) {
+      if (isEditing && editingDiary?.diaryId === id) {
         resetForm();
       }
     } catch (err: any) {
@@ -109,7 +109,7 @@ const MainPage: React.FC<MainPageProps> = ({
 
   // Prepare edit mode
   const startEdit = (diary: Diary) => {
-    if (!diary.id) return;
+    if (!diary.diaryId) return;
     setIsEditing(true);
     setEditingDiary(diary);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -185,17 +185,17 @@ const MainPage: React.FC<MainPageProps> = ({
   const filteredDiaries = diaries.filter((diary) => {
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.toLowerCase();
-      const titleMatch = diary.title?.toLowerCase().includes(keyword);
-      const contentMatch = diary.content?.toLowerCase().includes(keyword);
+      const titleMatch = diary.diaryTitle?.toLowerCase().includes(keyword);
+      const contentMatch = diary.diaryContent?.toLowerCase().includes(keyword);
       if (!titleMatch && !contentMatch) return false;
     }
 
     if (searchDate) {
-      if (diary.createdAt !== searchDate) return false;
+      if (diary.writtenDate !== searchDate) return false;
     }
 
     if (onlyWithImages) {
-      if (!diary.imageUrl) return false;
+      if (!diary.attachedPhotoUrl) return false;
     }
 
     return true;
@@ -232,8 +232,8 @@ const MainPage: React.FC<MainPageProps> = ({
               initialData={editingDiary}
               isEditing={isEditing}
               onSubmit={(diary, imageFile) => {
-                if (isEditing && editingDiary?.id) {
-                  diary.id = editingDiary.id;
+                if (isEditing && editingDiary?.diaryId) {
+                  diary.diaryId = editingDiary.diaryId;
                 }
                 handleSaveDiary(diary, imageFile);
               }}
