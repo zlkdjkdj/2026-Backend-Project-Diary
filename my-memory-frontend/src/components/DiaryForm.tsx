@@ -65,7 +65,6 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
       authorEmail: '', // 백엔드에서 인증 토큰으로 처리됨
       diaryTitle: title,
       diaryContent: content,
-      selectedEmotion: 'Happy', // 기분 기능 삭제로 인한 기본값 고정
       attachedPhotoUrl: imageUrl.trim() ? imageUrl : undefined,
       writtenDate: createdAt,
     }, imageFile);

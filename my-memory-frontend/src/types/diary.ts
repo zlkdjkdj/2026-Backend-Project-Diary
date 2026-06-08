@@ -3,7 +3,6 @@ export interface Diary {
   authorEmail: string;
   diaryTitle: string;
   diaryContent: string;
-  selectedEmotion: string;
   attachedPhotoUrl?: string;
   writtenDate?: string; // YYYY-MM-DD
 }

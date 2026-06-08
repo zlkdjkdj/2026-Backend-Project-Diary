@@ -15,7 +15,6 @@ public class DiaryForm {
     private String authorEmail;
     private String diaryTitle;
     private String diaryContent;
-    private String selectedEmotion;
     private String attachedPhotoUrl;
     private LocalDate writtenDate;
 
@@ -25,7 +24,6 @@ public class DiaryForm {
         entity.setAuthorEmail(this.authorEmail);
         entity.setDiaryTitle(this.diaryTitle);
         entity.setDiaryContent(this.diaryContent);
-        entity.setSelectedEmotion(this.selectedEmotion);
         entity.setAttachedPhotoUrl(this.attachedPhotoUrl);
         entity.setWrittenDate(this.writtenDate == null ? LocalDate.now() : this.writtenDate);
         return entity;
@@ -38,7 +36,6 @@ public class DiaryForm {
                 entity.getAuthorEmail(),
                 entity.getDiaryTitle(),
                 entity.getDiaryContent(),
-                entity.getSelectedEmotion(),
                 entity.getAttachedPhotoUrl(),
                 entity.getWrittenDate()
         );

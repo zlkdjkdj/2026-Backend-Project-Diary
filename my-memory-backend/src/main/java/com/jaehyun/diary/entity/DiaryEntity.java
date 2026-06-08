@@ -14,7 +14,6 @@ public class DiaryEntity {
     private String authorEmail;
     private String diaryTitle;
     private String diaryContent;
-    private String selectedEmotion;
     private String attachedPhotoUrl;
     private LocalDate writtenDate;
 }
