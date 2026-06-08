@@ -31,11 +31,11 @@ const LoginPage: React.FC<LoginPageProps> = ({
 
     setLoading(true);
     try {
-      const response = await authApi.login({ email, password });
-      setToken(response.token);
-      setCurrentUser({ email: response.email, nickname: response.nickname });
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('currentUser', JSON.stringify({ email: response.email, nickname: response.nickname }));
+      const response = await authApi.login({ userEmail: email, rawPassword: password });
+      setToken(response.accessToken);
+      setCurrentUser({ email: response.userEmail, nickname: response.userNickname });
+      localStorage.setItem('token', response.accessToken);
+      localStorage.setItem('currentUser', JSON.stringify({ email: response.userEmail, nickname: response.userNickname }));
       navigate('/');
     } catch (err: any) {
       showAlert(err.message || '로그인 중 오류가 발생했습니다.');

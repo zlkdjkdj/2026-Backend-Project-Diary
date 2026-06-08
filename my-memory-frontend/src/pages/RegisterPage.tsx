@@ -24,7 +24,7 @@ const RegisterPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const msg = await authApi.register({ email, password, nickname });
+      const msg = await authApi.register({ userEmail: email, rawPassword: password, userNickname: nickname });
       showAlert(msg, 'success');
       setTimeout(() => {
         navigate('/login');
