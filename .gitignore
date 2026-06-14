@@ -21,3 +21,7 @@ uploads/
 
 # OS
 .DS_Store
+*.zip
+*.mov
+*.mp4
+참고폴더/

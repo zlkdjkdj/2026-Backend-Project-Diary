@@ -3,7 +3,8 @@ import { isMock, getCurrentUserId } from './apiConfig';
 
 const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/diary` : '/api/diary';
 
-// 초기 다이어리 데이터 설정
+// 로컬 스토리지 캐싱 일기 도메인 데이터 파싱 및 반환 (Mock UI 테스트 용도)
+// return: 다이어리 엔티티 배열
 const getMockDiaries = (): Diary[] => {
   const diaries = localStorage.getItem('mock_diaries');
   if (!diaries) {
@@ -29,7 +30,9 @@ const getMockDiaries = (): Diary[] => {
   return JSON.parse(diaries);
 };
 
-// 파일 데이터를 Base64 스트링으로 변환하는 헬퍼 함수
+// 원본 File/Blob 객체 Base64 Data URL 형변환 유틸리티 (로컬 이미지 캐싱)
+// param: 변환할 원본 파일 객체
+// return: Base64 직렬화 문자열 반환 Promise
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -39,6 +42,8 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+// 일반 JSON REST API 요청 표준 HTTP 헤더 생성 (인증 토큰 주입)
+// return: 설정 완료 Headers 매핑 딕셔너리
 const getHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -47,6 +52,8 @@ const getHeaders = () => {
   };
 };
 
+// 멀티파트 폼 데이터 HTTP 전송 헤더 생성 (인증 토큰만 첨부)
+// return: 인증 토큰 포함 Headers 매핑 딕셔너리
 const getMultipartHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -54,8 +61,11 @@ const getMultipartHeaders = () => {
   };
 };
 
+// 일기 도메인(Diary) CRUD 및 백업/복원 기능 수행 API 통신 모듈
+// HTTP 요청 추상화 및 멀티파트 데이터 처리
 export const diaryApi = {
-  // Fetch all diaries
+  // 인증된 사용자 소속 전체 일기 레코드 서버 비동기 조회
+  // return: 일기 객체 배열 반환 Promise
   getAll: async (): Promise<Diary[]> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -71,7 +81,7 @@ export const diaryApi = {
     return response.json();
   },
 
-  // Search diaries
+  // 키워드 기반 일기 검색
   search: async (keyword: string): Promise<Diary[]> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -90,7 +100,7 @@ export const diaryApi = {
     return response.json();
   },
 
-  // Create a new diary
+  // 신규 일기 생성
   create: async (diary: Diary, imageFile?: File | null): Promise<Diary> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -137,7 +147,7 @@ export const diaryApi = {
     return response.json();
   },
 
-  // Update an existing diary
+  // 기존 일기 정보 수정
   update: async (id: string, diary: Diary, imageFile?: File | null): Promise<Diary> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -188,7 +198,7 @@ export const diaryApi = {
     return response.json();
   },
 
-  // Delete a diary
+  // 지정 일기 삭제
   delete: async (id: string): Promise<void> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 400));
@@ -207,7 +217,7 @@ export const diaryApi = {
     }
   },
 
-  // Backup all data and images
+  // 시스템 전체 데이터 및 이미지 백업
   backup: async (): Promise<Blob> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -227,7 +237,7 @@ export const diaryApi = {
     return response.blob();
   },
 
-  // Restore data and images
+  // 업로드 파일 기반 데이터 시스템 복원
   restore: async (file: File): Promise<string> => {
     if (isMock()) {
       await new Promise(resolve => setTimeout(resolve, 800));

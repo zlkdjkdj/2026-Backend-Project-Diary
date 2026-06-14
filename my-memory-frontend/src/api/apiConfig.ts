@@ -1,22 +1,28 @@
-// Mock 모드 확인 (기본값 true)
+// API 통신 글로벌 환경 설정 및 공통 유틸리티 캡슐화 모듈
+// 개발/운영 환경 분리 및 자원 URL 표준화
+
+// 애플리케이션 Mock API 모드 실행 여부 판별
+// return: Mock 모드 활성화 여부
 export const isMock = (): boolean => import.meta.env.VITE_USE_MOCK_API === 'true';
 
-// 현재 로그인한 사용자 ID (email)
+// 로컬 스토리지 캐싱 세션 데이터 기반 현재 인증 사용자 이메일 추출
+// return: 현재 사용자 이메일 문자열 (비인증 시 'anonymous')
 export const getCurrentUserId = (): string => {
   const user = localStorage.getItem('currentUser');
   return user ? JSON.parse(user).email : 'anonymous';
 };
 
-// 이미지 상대경로를 백엔드 서버 절대경로로 변환하는 헬퍼 함수
+// 데이터베이스 이미지 상대 경로를 백엔드 서버 절대 URL 체계로 변환
+// 외부 URL/Base64 데이터는 변환 없이 원본 반환
+// param: 변환 대상 원본 URL/경로
+// return: 클라이언트 접근 가능 완전한 형태 URL 문자열
 export const getImageUrl = (url?: string): string => {
   if (!url) return '';
   if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
   const apiBase = import.meta.env.VITE_API_URL || '';
-  // VITE_API_URL이 존재하고 슬래시가 없는 경우 슬래시 처리
   const cleanBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
   const cleanUrl = url.startsWith('/') ? url : `/${url}`;
   return `${cleanBase}${cleanUrl}`;
 };
-

@@ -1,10 +1,15 @@
 import React from 'react';
 
+// GoogleDriveWidget 컴포넌트 프로퍼티 타입 정의
 interface GoogleDriveWidgetProps {
   show: boolean;
   onClose: () => void;
 }
 
+// 구글 드라이브 백업 데이터 보관 유도 플로팅(Floating) 위젯 컴포넌트
+// 화면 하단 고정 상기 및 외부 서비스 연결 제공
+// param: 노출 여부 및 닫기 콜백
+// return: 렌더링 플로팅 위젯 레이아웃 (미노출 시 null)
 const GoogleDriveWidget: React.FC<GoogleDriveWidgetProps> = ({ show, onClose }) => {
   if (!show) return null;
 
