@@ -8,46 +8,55 @@ import Header from '../components/Header';
 import SearchFilter from '../components/SearchFilter';
 import GoogleDriveWidget from '../components/GoogleDriveWidget';
 
+// MainPage 컴포넌트 프로퍼티 타입 정의
 interface MainPageProps {
   token: string | null;
   currentUser: { email: string; nickname: string } | null;
   onLogout: () => void;
 }
 
+// 인증 사용자 접근 메인 뷰포트(Viewport) 컴포넌트
+// 일기 데이터 생명주기(CRUD) 및 상태 중앙 관리
+// param: 인증 토큰, 사용자 정보, 로그아웃 콜백
+// return: 메인 페이지 UI 렌더링 결과
 const MainPage: React.FC<MainPageProps> = ({
   token,
   currentUser,
   onLogout,
 }) => {
+  // 도메인 데이터 및 네트워크 통신 상태 관리
   const [diaries, setDiaries] = useState<Diary[]>([]);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Search & Filter State
+  // 검색 및 필터링 관련 상태 관리
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [onlyWithImages, setOnlyWithImages] = useState(false);
 
-  // Form State
+  // 폼(Form) UI 관련 상태 관리 (신규 작성 및 수정 모드 전환)
   const [isEditing, setIsEditing] = useState(false);
   const [editingDiary, setEditingDiary] = useState<Diary | undefined>(undefined);
 
-  // Modal State
+  // 상세 보기 모달 창 상태 관리
   const [viewingDiary, setViewingDiary] = useState<Diary | null>(null);
 
-  // Alert State
+  // 시스템 알림(Toast/Alert) 메시지 상태 관리
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Google Drive Widget State
+  // 백업/복원을 위한 서드파티 통합 위젯 노출 상태
   const [showDriveWidget, setShowDriveWidget] = useState(true);
 
+  // 화면 상단 일시 노출 알림 메시지 설정
+  // param: 출력 메시지 본문
+  // param: 알림 성격 ('success' | 'error')
   const showAlert = (text: string, type: 'success' | 'error' = 'success') => {
     setAlertMessage({ type, text });
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // Fetch all diaries
+  // 서버 API 연동 인증 사용자 전체 일기 데이터 비동기 조회
   const fetchDiaries = async () => {
     if (!token) return;
     setFetchLoading(true);
@@ -65,7 +74,9 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // Save diary (Create or Update)
+  // 신규 생성 및 기존 수정 API 요청 처리
+  // param: 전송 일기 데이터
+  // param: 첨부 멀티파트 이미지 파일 (선택)
   const handleSaveDiary = async (diary: Diary, imageFile: File | null) => {
     if (!token) return;
     setActionLoading(true);
@@ -86,7 +97,8 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // Delete diary
+  // 지정 식별자 일기 데이터 삭제 요청
+  // param: 삭제 대상 일기 고유 ID
   const handleDelete = async (id: string) => {
     if (!token) return;
     if (!window.confirm('정말로 이 일기를 삭제하시겠습니까?')) {
@@ -107,7 +119,8 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // Prepare edit mode
+  // 선택 일기 데이터 폼 주입 및 수정 모드 전환
+  // param: 수정 대상 일기 객체
   const startEdit = (diary: Diary) => {
     if (!diary.diaryId) return;
     setIsEditing(true);
@@ -115,13 +128,13 @@ const MainPage: React.FC<MainPageProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Reset Form
+  // 입력 폼 상태 초기화 및 신규 작성 모드 전환
   const resetForm = () => {
     setIsEditing(false);
     setEditingDiary(undefined);
   };
 
-  // Backup Handler
+  // 사용자 전체 일기 및 이미지 데이터 ZIP 비동기 다운로드
   const handleBackup = async () => {
     if (!token) return;
     setActionLoading(true);
@@ -143,7 +156,8 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // Restore Handler
+  // 업로드 ZIP 아카이브 서버 전송 및 시스템 상태 동기화(복원)
+  // param: 파일 입력 이벤트 객체
   const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!token) return;
     const file = e.target.files?.[0];
@@ -167,7 +181,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // Filter Reset Handler
+  // 검색어 및 날짜 필터링 조건 초기화 및 목록 재렌더링
   const handleResetFilters = () => {
     setSearchKeyword('');
     setSearchDate('');
@@ -181,7 +195,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   }, [token]);
 
-  // Filter diaries locally based on search filters
+  // 메모리에 적재된 전체 일기 데이터를 기반으로 검색/필터링 로직을 수행합니다 (Client-side Filtering).
   const filteredDiaries = diaries.filter((diary) => {
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.toLowerCase();
@@ -211,9 +225,7 @@ const MainPage: React.FC<MainPageProps> = ({
         onLogout={onLogout}
       />
 
-      {/* Main Content */}
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Alerts */}
         {alertMessage && (
           <div
             className={`fixed top-20 right-8 z-50 px-5 py-3 rounded-xl border shadow-sm flex items-center gap-2.5 transition-all bg-white text-gray-900 dark:bg-neutral-900 dark:text-neutral-100 dark:border-neutral-800 ${
@@ -226,7 +238,6 @@ const MainPage: React.FC<MainPageProps> = ({
         )}
 
         <div className="max-w-7xl mx-auto w-full space-y-8">
-          {/* Centered Diary Form Card */}
           <div className="max-w-7xl mx-auto w-full">
             <DiaryForm
               initialData={editingDiary}
@@ -242,9 +253,7 @@ const MainPage: React.FC<MainPageProps> = ({
             />
           </div>
 
-          {/* Divider and List Section */}
           <div className="border-t border-gray-200/80 dark:border-neutral-800/80 pt-8 space-y-6">
-            {/* Search & Filter Box */}
             <SearchFilter
               searchKeyword={searchKeyword}
               setSearchKeyword={setSearchKeyword}
@@ -257,14 +266,12 @@ const MainPage: React.FC<MainPageProps> = ({
               fetchLoading={fetchLoading}
             />
 
-            {/* Error Message */}
             {error && (
               <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-red-700 dark:text-red-400 text-sm font-medium">
                 ⚠️ {error}
               </div>
             )}
 
-            {/* List Header */}
             <div className="flex items-center justify-between">
               <h3 className="text-gray-950 dark:text-white font-semibold text-base flex items-center gap-2 tracking-tight">
                 <span>{currentUser?.nickname}님의 일기 목록</span>
@@ -274,7 +281,6 @@ const MainPage: React.FC<MainPageProps> = ({
               </h3>
             </div>
 
-            {/* List Grid */}
             <DiaryList
               diaries={filteredDiaries}
               fetchLoading={fetchLoading}
@@ -286,7 +292,6 @@ const MainPage: React.FC<MainPageProps> = ({
         </div>
       </main>
 
-      {/* Floating Google Drive Widget at bottom right */}
       <GoogleDriveWidget
         show={token !== null && currentUser !== null && showDriveWidget}
         onClose={() => setShowDriveWidget(false)}

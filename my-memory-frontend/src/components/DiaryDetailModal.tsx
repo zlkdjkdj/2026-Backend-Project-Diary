@@ -2,15 +2,18 @@ import React from 'react';
 import { type Diary } from '../types/diary';
 import { getImageUrl } from '../api/apiConfig';
 
+// DiaryDetailModal 컴포넌트 프로퍼티 타입 정의
 interface DiaryDetailModalProps {
   diary: Diary | null;
   onClose: () => void;
 }
 
+// 일기 상세 내용 모달(Modal) 렌더링 UI 컴포넌트
+// 고해상도 이미지 및 전체 텍스트 본문 표시
+// param: 대상 일기 객체 및 모달 닫기 콜백
+// return: 모달 오버레이 JSX 컨테이너
 const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) => {
   if (!diary) return null;
-
-
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
