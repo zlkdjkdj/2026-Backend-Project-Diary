@@ -14,14 +14,14 @@ import java.util.Map;
 @Slf4j // 로깅 객체(log)를 자동 생성, 에러 기록을 돕는 롬복 어노테이션
 public class GlobalExceptionHandler {
 
-    // 잘못된 요청 인자(IllegalArgumentException) 예외 처리
+    // 잘못된 요청 인자 예외 처리
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
         // 에러 원인을 서버 측 로그(warn 레벨)로 기록하여 추적
         log.warn("IllegalArgumentException occurred: {}", e.getMessage());
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        // 단, 에러 메시지가 "권한이 없습니다."인 경우 소유권 위반으로 간주하여 403 Forbidden 상태 코드로 변경
+        // 권한 없으면 403으로 변환후 출력
         if ("권한이 없습니다.".equals(e.getMessage())) {
             status = HttpStatus.FORBIDDEN;
         }
@@ -33,7 +33,6 @@ public class GlobalExceptionHandler {
     }
 
     // 보안 위반(SecurityException) 예외 처리
-    // param: e - 보안 관련 로직 수행 중 포착된 SecurityException 객체
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<Map<String, String>> handleSecurityException(SecurityException e) {
         log.warn("SecurityException occurred: {}", e.getMessage());
@@ -44,7 +43,6 @@ public class GlobalExceptionHandler {
     }
 
     // 명시적으로 처리되지 않은 모든 일반 예외(Exception) 처리
-    // param: e - 위 핸들러들에 매칭되지 않은 최상위 Exception 예외 객체 (예: 널포인터, DB 타임아웃 등)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(Exception e) {
         // 알 수 없는 서버 오류이므로 스택 트레이스 전체를 error 레벨로 로깅

@@ -27,9 +27,6 @@ public class DiaryApiController {
     private FileService fileService;
 
     // creatediary
-    // param: diaryInputData - 멀티파트 요청의 'diary' 파트에서 JSON 형태로 넘어온 일기 데이터 DTO 객체
-    // param: diaryImageFile - 멀티파트 요청의 'image' 파트에서 넘어온 첨부 사진 파일 객체 (필수값 아님)
-    // return: 성공적으로 생성된 일기 데이터를 담은 DTO 객체를 JSON 형태로 반환
     @PostMapping
     public DiaryForm createDiary(
             Principal principal, // 현재 로그인 한 사용자 정보 객체
@@ -38,19 +35,17 @@ public class DiaryApiController {
 
         // 이미지 파일 검사
         if (diaryImageFile != null && !diaryImageFile.isEmpty()) {
-            // 디스크에 파일을 저장, 접근 가능한 URL 경로(imageUrl)를 반환
+            // 접근 가능한 URL 경로(imageUrl)를 반환
             String imageUrl = fileService.saveFile(diaryImageFile);
-            // 업로드된 이미지의 URL을 DB 저장을 위해 DTO에 세팅
+            // URL을 DB 저장을 위해 DTO에 세팅
             diaryInputData.setAttachedPhotoUrl(imageUrl);
         }
 
-        // 인증된 사용자 이메일 과 조립이 완료된 DTO를 DiaryService에 넘겨 DB에 최종 저장
+        // 인증된 사용자 이메일 과  DTO를 DiaryService에 넘겨 DB에 최종 저장
         return diaryService.createDiary(principal.getName(), diaryInputData);
     }
 
     // 인증 사용자 작성 전체 일기 목록 조회
-    // param: principal - 현재 토큰으로 인증된 사용자 정보 객체
-    // return: 해당 사용자가 작성한 일기들의 목록을 DTO 리스트 형태로 반환
     @GetMapping
     public List<DiaryForm> getAllDiaries(Principal principal) {
         // 이메일 넘겨 전체 일기 목록 조회
@@ -58,10 +53,9 @@ public class DiaryApiController {
     }
 
     // 특정 키워드 포함 사용자 일기 검색
-    // param: principal - 현재 인증된 사용자 객체
     @GetMapping("/search")
     public List<DiaryForm> searchDiaries(Principal principal, @RequestParam("keyword") String searchKeyword) {
-        // diaryService에 식별자와 검색어를 함께 넘겨 조건에 맞는 데이터만 필터링하여 반환받음
+        // diaryService에 식별자와 검색어를 넘겨 조건에 맞는 데이터만 반환받음
         return diaryService.searchDiaries(principal.getName(), searchKeyword);
     }
 

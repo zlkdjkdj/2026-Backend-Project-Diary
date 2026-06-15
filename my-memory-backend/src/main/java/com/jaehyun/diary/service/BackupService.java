@@ -36,10 +36,10 @@ public class BackupService {
         Path imagesZipPath = tempDir.resolve("images.zip");
 
         try {
-            // 1. DB 데이터를 JSON으로 변환하여 임시 저장
+            // DB 데이터를 JSON으로 변환하여 임시 저장
             objectMapper.writeValue(backupJsonPath.toFile(), diaryRepository.findAll());
 
-            // 2. 업로드된 이미지 파일들을 ZIP으로 압축
+            // 업로드된 이미지 파일들을 ZIP으로 압축
             Path uploadsPath = Paths.get(uploadDir);
             if (Files.exists(uploadsPath)) {
                 try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(imagesZipPath));
@@ -56,7 +56,7 @@ public class BackupService {
                 }
             }
 
-            // 3. JSON 파일과 이미지 ZIP 파일을 최종 아카이브로 통합
+            // JSON 파일과 이미지 ZIP 파일을 최종 아카이브로 통합
             try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
                 zos.putNextEntry(new ZipEntry("backup.json"));
                 Files.copy(backupJsonPath, zos);
@@ -83,7 +83,7 @@ public class BackupService {
         Path imagesZipPath = tempDir.resolve("images.zip");
 
         try {
-            // 1. 전달받은 ZIP 아카이브 해제 (JSON, 이미지 ZIP 분리)
+            // 전달받은 ZIP 아카이브 해제 (JSON, 이미지 ZIP 분리)
             try (ZipInputStream zis = new ZipInputStream(zipInputStream)) {
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
@@ -94,14 +94,14 @@ public class BackupService {
                     }
                 }
             }
-
+            // 필수 백업 파일인 데이터베이스 스냅샷 검증 및 객체 변환
             if (!Files.exists(backupJsonPath)) {
                 throw new FileNotFoundException("backup.json 파일 누락");
             }
             List<DiaryEntity> newDiaries = objectMapper.readValue(backupJsonPath.toFile(), new TypeReference<>() {
             });
 
-            // 2. 이미지 ZIP 파일 해제
+            // 이미지 ZIP 파일 해제
             if (Files.exists(imagesZipPath)) {
                 try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(imagesZipPath))) {
                     ZipEntry entry;
@@ -116,14 +116,14 @@ public class BackupService {
                 }
             }
 
-            // 3. 복원 실패 시 롤백을 위한 기존 데이터 백업
+            // 복원 실패 시 롤백을 위한 기존 데이터 백업
             List<DiaryEntity> originalDiaries = diaryRepository.findAll();
             Path uploadsPath = Paths.get(uploadDir);
             if (Files.exists(uploadsPath)) {
                 FileSystemUtils.copyRecursively(uploadsPath, tempUploadsBackupDir);
             }
 
-            // 4. 기존 데이터 삭제 및 신규 데이터 적재 (트랜잭션)
+            // 기존 데이터 삭제 및 신규 데이터 적재 (트랜잭션)
             try {
                 diaryRepository.deleteAll();
                 diaryRepository.saveAll(newDiaries);
@@ -149,7 +149,7 @@ public class BackupService {
             }
 
         } finally {
-            // 5. 사용한 임시 리소스 정리
+            // 사용한 임시 리소스 정리
             FileSystemUtils.deleteRecursively(tempDir);
             FileSystemUtils.deleteRecursively(tempImagesExtractDir);
             FileSystemUtils.deleteRecursively(tempUploadsBackupDir);
