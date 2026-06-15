@@ -33,14 +33,6 @@ const Header: React.FC<HeaderProps> = ({
               <span className="text-xs font-medium text-gray-600 dark:text-neutral-400 mr-2">
                 <span className="text-black dark:text-neutral-100 font-semibold">{currentUser.nickname}</span>님
               </span>
-              <a
-                href="https://drive.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 text-xs rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 border border-transparent font-medium cursor-pointer transition-colors inline-flex items-center gap-1"
-              >
-                구글드라이브 이동 ↗
-              </a>
               <button
                 onClick={onLogout}
                 className="px-3 py-1.5 text-xs rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 transition-colors border border-transparent font-medium cursor-pointer"

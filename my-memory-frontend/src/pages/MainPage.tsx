@@ -6,7 +6,6 @@ import DiaryList from '../components/DiaryList';
 import DiaryDetailModal from '../components/DiaryDetailModal';
 import Header from '../components/Header';
 import SearchFilter from '../components/SearchFilter';
-import GoogleDriveWidget from '../components/GoogleDriveWidget';
 
 // MainPage 컴포넌트 프로퍼티 타입 정의
 interface MainPageProps {
@@ -45,8 +44,7 @@ const MainPage: React.FC<MainPageProps> = ({
   // 시스템 알림(Toast/Alert) 메시지 상태 관리
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // 백업/복원을 위한 서드파티 통합 위젯 노출 상태
-  const [showDriveWidget, setShowDriveWidget] = useState(true);
+
 
   // 화면 상단 일시 노출 알림 메시지 설정
   // param: 출력 메시지 본문
@@ -243,10 +241,7 @@ const MainPage: React.FC<MainPageProps> = ({
         </div>
       </main>
 
-      <GoogleDriveWidget
-        show={token !== null && currentUser !== null && showDriveWidget}
-        onClose={() => setShowDriveWidget(false)}
-      />
+
 
       {viewingDiary && (
         <DiaryDetailModal diary={viewingDiary} onClose={() => setViewingDiary(null)} />
