@@ -157,7 +157,9 @@ const MainPage: React.FC<MainPageProps> = ({
     }
 
     if (searchDate) {
-      if (diary.writtenDate !== searchDate) return false;
+      if (!diary.writtenDate) return false;
+      const diaryDate = diary.writtenDate.split('T')[0];
+      if (diaryDate !== searchDate) return false;
     }
 
     if (onlyWithImages) {

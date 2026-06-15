@@ -11,6 +11,18 @@ interface DiaryFormProps {
   actionLoading: boolean;
 }
 
+// Helper to safely get timezone-aware local date string (YYYY-MM-DD)
+const getLocalDateString = (dateInput?: string) => {
+  if (dateInput) {
+    return dateInput.split('T')[0];
+  }
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // 신규 작성 및 기존 일기 수정용 입력 폼(Form) 컴포넌트
 // 텍스트 데이터 및 멀티파트 이미지 파일 클라이언트 상태 관리
 // param: 초기 데이터, 수정 여부, 액션 콜백 및 로딩 상태
@@ -28,7 +40,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
   const [imageUrl, setImageUrl] = useState(initialData?.attachedPhotoUrl || '');
   const [createdAt, setCreatedAt] = useState(
-    initialData?.writtenDate || new Date().toISOString().split('T')[0]
+    getLocalDateString(initialData?.writtenDate)
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -40,7 +52,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
       setImageUrl(initialData.attachedPhotoUrl || '');
       setPreviewUrl(initialData.attachedPhotoUrl || '');
-      setCreatedAt(initialData.writtenDate || new Date().toISOString().split('T')[0]);
+      setCreatedAt(getLocalDateString(initialData.writtenDate));
       setImageFile(null);
     } else {
       setTitle('');
@@ -48,7 +60,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
       setImageUrl('');
       setPreviewUrl('');
-      setCreatedAt(new Date().toISOString().split('T')[0]);
+      setCreatedAt(getLocalDateString());
       setImageFile(null);
     }
   }, [initialData]);

@@ -84,10 +84,11 @@ public class S3ConnectionTest {
     public void testGetAllDiariesApi() throws Exception {
         System.out.println("API GET /api/diary 호출 테스트 시작...");
         try {
-            mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/diary")
+            String responseBody = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/diary")
                     .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("test@example.com")))
-                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
-            System.out.println("GET API 호출 성공!");
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+            System.out.println("GET API 호출 성공! 응답 본문: " + responseBody);
         } catch (Exception e) {
             System.err.println("GET API 호출 실패!");
             e.printStackTrace();
@@ -99,6 +100,9 @@ public class S3ConnectionTest {
     public void testCreateDiaryApi() throws Exception {
         System.out.println("API POST /api/diary 호출 테스트 시작...");
         try {
+            // 기존 테스트 데이터 클린업 (하루 3개 제한 방지)
+            diaryRepository.findByAuthorEmail("test@example.com").forEach(d -> diaryRepository.delete(d));
+
             String diaryJson = "{\"diaryTitle\":\"테스트 제목\",\"diaryContent\":\"테스트 내용\",\"writtenDate\":\"2026-06-15\"}";
             org.springframework.mock.web.MockMultipartFile diaryPart = new org.springframework.mock.web.MockMultipartFile(
                     "diary",
@@ -127,8 +131,10 @@ public class S3ConnectionTest {
         String nickname = "테스터";
 
         try {
-            // 1. 기존 유저 정리
+            // 1. 기존 유저 및 일기 정리
             userRepository.findByUserEmail(testEmail).ifPresent(u -> userRepository.delete(u));
+            diaryRepository.findByAuthorEmail(testEmail).forEach(d -> diaryRepository.delete(d));
+            System.out.println("1. 이전 데이터 정리 완료");
 
             // 2. 회원가입
             com.jaehyun.diary.dto.AuthForm.RegisterForm regForm = new com.jaehyun.diary.dto.AuthForm.RegisterForm();
@@ -136,7 +142,7 @@ public class S3ConnectionTest {
             regForm.setRawPassword(testPassword);
             regForm.setUserNickname(nickname);
             authService.register(regForm);
-            System.out.println("1. 회원가입 완료");
+            System.out.println("2. 회원가입 완료");
 
             // 3. 로그인 및 토큰 발급
             com.jaehyun.diary.dto.AuthForm.LoginForm loginForm = new com.jaehyun.diary.dto.AuthForm.LoginForm();
