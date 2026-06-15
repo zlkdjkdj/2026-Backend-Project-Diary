@@ -37,40 +37,62 @@ my-memory/
 │   └── vite.config.ts             # 프론트엔드 설정 및 프록시 설정
 │
 └── my-memory-backend/             # 백엔드 (Spring Boot + MongoDB Atlas)
-    ├── src/main/java/com/jaehyun/diary/
-    │   ├── MyMemoryBackendApplication.java # Spring Boot 메인 진입점
-    │   ├── api/                   # REST API 컨트롤러 레이어
-    │   │   ├── AuthApiController.java     # 회원가입 및 로그인 처리
-    │   │   ├── DiaryApiController.java    # 일기 등록/수정/삭제/검색 처리
-    │   │   └── BackupApiController.java   # 데이터 백업 및 복원 기능
+    ├── Dockerfile                 # 도커 이미지 배포용 설정 파일
+    ├── build.gradle               # Gradle 의존성 및 프로젝트 빌드 설정
+    ├── settings.gradle            # Gradle 프로젝트 세팅 설정
+    ├── gradlew / gradlew.bat      # Gradle 래퍼 실행 스크립트
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/jaehyun/diary/
+    │   │   │   ├── MyMemoryBackendApplication.java # Spring Boot 메인 진입점
+    │   │   │   ├── api/                   # REST API 컨트롤러 레이어
+    │   │   │   │   ├── AuthApiController.java     # 회원가입 및 로그인 처리
+    │   │   │   │   ├── DiaryApiController.java    # 일기 등록/수정/삭제/검색 처리
+    │   │   │   │   └── BackupApiController.java   # 데이터 백업 및 복원 기능
+    │   │   │   │
+    │   │   │   ├── dto/                   # 데이터 전송 객체 (DTO) 레이어
+    │   │   │   │   ├── DiaryForm.java             # 일기 생성/수정 데이터 교환용 DTO
+    │   │   │   │   └── AuthForm.java              # 로그인/회원가입 요청 및 응답 DTO
+    │   │   │   │
+    │   │   │   ├── entity/                # MongoDB 도메인 엔티티 레이어
+    │   │   │   │   ├── DiaryEntity.java           # 일기 데이터베이스 매핑 모델
+    │   │   │   │   ├── UserEntity.java            # 사용자 데이터베이스 매핑 모델
+    │   │   │   │   └── UserRole.java              # 권한 분류 열거형 (USER, ADMIN)
+    │   │   │   │
+    │   │   │   ├── repository/            # 데이터 액세스 인터페이스 레이어
+    │   │   │   │   ├── DiaryRepository.java       # 일기 쿼리 인터페이스
+    │   │   │   │   └── UserRepository.java        # 사용자 조회 인터페이스
+    │   │   │   │
+    │   │   │   ├── service/               # 비즈니스 로직 레이어
+    │   │   │   │   ├── DiaryService.java          # 일기 관련 비즈니스 로직
+    │   │   │   │   ├── AuthService.java           # 사용자 인증 및 토큰 발급
+    │   │   │   │   ├── FileService.java           # 업로드 파일 로컬 저장 및 처리
+    │   │   │   │   └── BackupService.java         # 백업 파일 생성 및 복원 처리
+    │   │   │   │
+    │   │   │   └── config/                # 설정 및 보안 설정
+    │   │   │       ├── MongoConfig.java           # MongoDB 연결 설정
+    │   │   │       ├── WebConfig.java             # 정적 자원 매핑 설정
+    │   │   │       ├── SecurityConfig.java        # 스프링 시큐리티 인가 설정
+    │   │   │       ├── JwtFilter.java             # JWT 검증 및 인가 필터
+    │   │   │       ├── JwtUtil.java               # JWT 생성 및 파싱
+    │   │   │       ├── GlobalExceptionHandler.java # 전역 예외 처리 핸들러
+    │   │   │       ├── CheckOwnership.java        # 작성자 검증용 커스텀 어노테이션
+    │   │   │       └── OwnershipAspect.java       # 소유권 검증 AOP 구현체
+    │   │   │
+    │   │   └── resources/             # 설정 및 정적 자원 폴더
+    │   │       ├── application.yml                 # DB 연결 및 JWT 설정 정보
+    │   │       ├── static/                         # 정적 자원 폴더 (기본 빈 폴더)
+    │   │       └── templates/                      # 템플릿 폴더 (기본 빈 폴더)
     │   │
-    │   ├── dto/                   # 데이터 전송 객체 (DTO) 레이어
-    │   │   ├── DiaryForm.java             # 일기 생성/수정 데이터 교환용 DTO
-    │   │   └── AuthForm.java              # 로그인/회원가입 요청 및 응답 DTO
+    │   ├── test/                      # 백엔드 단위/통합 테스트 폴더
+    │   │   └── java/com/jaehyun/diary/
+    │   │       ├── MyMemoryBackendApplicationTests.java # 스프링 부트 로드 테스트
+    │   │       └── service/
+    │   │           └── DiaryServiceTest.java           # 일기 서비스 테스트
     │   │
-    │   ├── entity/                # MongoDB 도메인 엔티티 레이어
-    │   │   ├── DiaryEntity.java           # 일기 데이터베이스 매핑 모델
-    │   │   ├── UserEntity.java            # 사용자 데이터베이스 매핑 모델
-    │   │   └── UserRole.java              # 권한 분류 열거형 (USER, ADMIN)
-    │   │
-    │   ├── repository/            # 데이터 액세스 인터페이스 레이어
-    │   │   ├── DiaryRepository.java       # 일기 쿼리 인터페이스
-    │   │   └── UserRepository.java        # 사용자 조회 인터페이스
-    │   │
-    │   ├── service/               # 비즈니스 로직 레이어
-    │   │   ├── DiaryService.java          # 일기 관련 비즈니스 로직
-    │   │   ├── AuthService.java           # 사용자 인증 및 토큰 발급
-    │   │   ├── FileService.java           # 업로드 파일 로컬 저장 및 처리
-    │   │   └── BackupService.java         # 백업 파일 생성 및 복원 처리
-    │   │
-    │   └── config/                # 설정 및 보안 설정
-    │       ├── MongoConfig.java           # MongoDB 연결 설정
-    │       ├── WebConfig.java             # 정적 자원 매핑 설정
-    │       ├── SecurityConfig.java        # 스프링 시큐리티 인가 설정
-    │       ├── JwtFilter.java             # JWT 검증 및 인가 필터
-    │       └── JwtUtil.java               # JWT 생성 및 파싱
+    │   └── test.http                  # HTTP API 수동 요청 테스트 파일
     │
-    └── uploads/                   # 업로드된 이미지 파일 저장 경로
+    └── uploads/                   # 업로드된 이미지 파일 저장 경로 (동적 생성)
 ```
 
 ---

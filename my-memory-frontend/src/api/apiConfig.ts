@@ -1,10 +1,6 @@
 // API 통신 글로벌 환경 설정 및 공통 유틸리티 캡슐화 모듈
 // 개발/운영 환경 분리 및 자원 URL 표준화
 
-// 애플리케이션 Mock API 모드 실행 여부 판별
-// return: Mock 모드 활성화 여부
-export const isMock = (): boolean => import.meta.env.VITE_USE_MOCK_API === 'true';
-
 // 로컬 스토리지 캐싱 세션 데이터 기반 현재 인증 사용자 이메일 추출
 // return: 현재 사용자 이메일 문자열 (비인증 시 'anonymous')
 export const getCurrentUserId = (): string => {

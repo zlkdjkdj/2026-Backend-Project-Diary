@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserEntity {
 
     // MongoDB 문서 고유 식별자 (Object ID)
-    // DB 저장 시 MongoDB가 자동 생성하는 고유 키와 매핑
     @Id
     private String userId;
 
@@ -29,6 +28,6 @@ public class UserEntity {
     // 시스템 표시용 사용자 닉네임
     private String userNickname;
 
-    // 시스템 접근 수준 정의 인가(Authorization) 역할
+    // 시스템 접근 수준 정의 인가 역할
     private UserRole userRole;
 }

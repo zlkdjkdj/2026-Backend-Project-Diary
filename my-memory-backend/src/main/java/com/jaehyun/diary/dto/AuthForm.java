@@ -12,14 +12,13 @@ public class AuthForm {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginForm {
-        // 입력받은 이메일
+        // 이메일
         private String userEmail;
-        // 입력받은 평문 비밀번호 (보안 처리 전)
+        // 평문 비밀번호
         private String rawPassword;
     }
 
-    // 클라이언트 신규 사용자 가입 요청 데이터 컨테이너
-    // 역할: 회원가입 시 입력하는 정보들을 담아 컨트롤러로 전달하는 객체
+    // 회원가입 요청 데이터 컨테이너
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

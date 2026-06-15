@@ -25,3 +25,6 @@ uploads/
 *.mov
 *.mp4
 참고폴더/
+
+# JDK 설치 파일 제외
+oracleJdk-26.jdk/

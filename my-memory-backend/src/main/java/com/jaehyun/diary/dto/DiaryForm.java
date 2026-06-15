@@ -26,7 +26,6 @@ public class DiaryForm {
     private LocalDate writtenDate;
 
     // DTO 데이터를 영속성 엔티티(DiaryEntity)로 변환
-    // return: 조립이 완료된 DiaryEntity 인스턴스
     public DiaryEntity toEntity() {
         DiaryEntity entity = new DiaryEntity();
         // 각 필드를 엔티티에 매핑

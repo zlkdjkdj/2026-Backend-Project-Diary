@@ -8,9 +8,8 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-// @CheckOwnership 메서드 자원 소유권 검증 AOP 컴포넌트
 // 사용자의 이메일이 일치하는지 보안 검증하는 객체
-@Aspect // AOP(관점 지향 프로그래밍) 적용 클래스 명시
+@Aspect // AOP 적용 
 @Component // 스프링 빈 등록
 public class OwnershipAspect {
 
@@ -26,7 +25,7 @@ public class OwnershipAspect {
 
         // 엔티티에 기록된 원작성자의 이메일(getAuthorEmail)과 현재 요청자 이메일(email)을 비교
         if (!diary.getAuthorEmail().equals(email)) {
-            // 일치하지 않으면 소유권이 없으므로 권한 부족 예외(403 Forbidden으로 전환됨)를 던져 메서드 실행 원천 차단
+            // 불일치 시 차단
             throw new IllegalArgumentException("권한이 없습니다.");
         }
     }

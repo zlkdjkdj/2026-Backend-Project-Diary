@@ -4,8 +4,6 @@ import React from 'react';
 interface HeaderProps {
   currentUser: { email: string; nickname: string } | null;
   actionLoading: boolean;
-  onBackup: () => void;
-  onRestore: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLogout: () => void;
 }
 
@@ -16,8 +14,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   currentUser,
   actionLoading,
-  onBackup,
-  onRestore,
   onLogout,
 }) => {
   return (
@@ -39,27 +35,6 @@ const Header: React.FC<HeaderProps> = ({
               <span className="text-xs font-medium text-gray-600 dark:text-neutral-400 mr-2">
                 <span className="text-black dark:text-neutral-100 font-semibold">{currentUser.nickname}</span>님
               </span>
-              <button
-                onClick={onBackup}
-                disabled={actionLoading}
-                className="px-3 py-1.5 text-xs rounded-lg bg-black hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-black transition-colors font-medium cursor-pointer disabled:opacity-50"
-              >
-                백업
-              </button>
-              <label
-                className={`px-3 py-1.5 text-xs rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 border border-transparent font-medium cursor-pointer transition-colors ${
-                  actionLoading ? 'opacity-50 pointer-events-none' : ''
-                }`}
-              >
-                복원
-                <input
-                  type="file"
-                  accept=".zip"
-                  onChange={onRestore}
-                  disabled={actionLoading}
-                  className="hidden"
-                />
-              </label>
               <a
                 href="https://drive.google.com"
                 target="_blank"

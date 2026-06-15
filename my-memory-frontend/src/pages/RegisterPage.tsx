@@ -25,7 +25,6 @@ const RegisterPage: React.FC = () => {
 
   // 회원가입 폼 제출 이벤트 비동기 핸들러
   // 유효성 검사 및 사용자 생성 요청 (성공 시 로그인 전환)
-  // param: 폼 제출 DOM 이벤트 객체
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim() || !nickname.trim()) {

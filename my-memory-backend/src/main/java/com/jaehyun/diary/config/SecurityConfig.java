@@ -24,7 +24,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // jwtUtil: 토큰 파싱 및 검증을 위해 JWT 필터에 주입될 커스텀 유틸리티 객체
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -43,17 +42,17 @@ public class SecurityConfig {
 
         // 기본 제공되는 로그인 폼(화면) 비활성화
         http.formLogin(AbstractHttpConfigurer::disable);
-        // 기본 HTTP Basic 인증 비활성화 (아이디/비밀번호가 평문으로 날아가는 방식 방지)
+        // 기본 HTTP Basic 인증 비활성화 
         http.httpBasic(AbstractHttpConfigurer::disable);
 
-        // JWT를 사용, 세션 정책을 STATELESS(무상태)로 설정.
+        // 세션 정책을 STATELESS(무상태)로 설정.
         http.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // HTTP 요청 경로에 따른 접근 권한 설정
         http.authorizeHttpRequests(auth -> auth
-                // 회원가입, 로그인 등의 인증 API와 이미지 정적 자원(/uploads/**)은 로그인 없이 누구든 접근 가능(permitAll)
-                .requestMatchers("/api/auth/**", "/uploads/**").permitAll()
+                // 회원가입, 로그인 등의 인증 API는 로그인 없이 누구든 접근 가능(permitAll)
+                .requestMatchers("/api/auth/**").permitAll()
                 // 그 외의 모든 요청은 유효한 토큰 기반의 인증된(authenticated) 사용자만 접근 가능
                 .anyRequest().authenticated());
 
@@ -70,7 +69,7 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         // GET, POST 등 나열된 주요 HTTP 메서드 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // 클라이언트에서 전달하는 모든 HTTP 헤더(Authorization 등) 허용
+        // 모든 HTTP 헤더허용
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
         // 위에서 만든 정책(configuration)을 "/**" (모든 경로)에 일괄 적용

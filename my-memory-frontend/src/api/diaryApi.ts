@@ -1,46 +1,7 @@
 import type { Diary } from '../types/diary';
-import { isMock, getCurrentUserId } from './apiConfig';
+import { getCurrentUserId } from './apiConfig';
 
 const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/diary` : '/api/diary';
-
-// 로컬 스토리지 캐싱 일기 도메인 데이터 파싱 및 반환 (Mock UI 테스트 용도)
-// return: 다이어리 엔티티 배열
-const getMockDiaries = (): Diary[] => {
-  const diaries = localStorage.getItem('mock_diaries');
-  if (!diaries) {
-    const defaultDiaries: Diary[] = [
-      {
-        diaryId: 'mock-diary-1',
-        authorEmail: 'test@test.com',
-        diaryTitle: '오늘의 일기: 평온한 카페 투어',
-        diaryContent: '동네에 새로 생긴 예쁜 북카페에 다녀왔다. 조용한 음악이 흐르고 커피 맛도 훌륭해서 앞으로 자주 방문하게 될 것 같다. 밀린 독서도 조금 하고 머리를 식힐 수 있었던 소중한 시간이었다.',
-        writtenDate: new Date().toISOString().split('T')[0],
-      },
-      {
-        diaryId: 'mock-diary-2',
-        authorEmail: 'test@test.com',
-        diaryTitle: '신나는 코딩 공부!',
-        diaryContent: '백엔드 없이 프론트엔드를 완벽하게 모사하는 Mock API를 구현했다. 생각보다 자연스럽게 잘 작동해서 신기하고 재미있었다. 앞으로 시연할 때 정말 큰 도움이 될 것 같다!',
-        writtenDate: new Date().toISOString().split('T')[0],
-      }
-    ];
-    localStorage.setItem('mock_diaries', JSON.stringify(defaultDiaries));
-    return defaultDiaries;
-  }
-  return JSON.parse(diaries);
-};
-
-// 원본 File/Blob 객체 Base64 Data URL 형변환 유틸리티 (로컬 이미지 캐싱)
-// param: 변환할 원본 파일 객체
-// return: Base64 직렬화 문자열 반환 Promise
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-};
 
 // 일반 JSON REST API 요청 표준 HTTP 헤더 생성 (인증 토큰 주입)
 // return: 설정 완료 Headers 매핑 딕셔너리
@@ -67,13 +28,6 @@ export const diaryApi = {
   // 인증된 사용자 소속 전체 일기 레코드 서버 비동기 조회
   // return: 일기 객체 배열 반환 Promise
   getAll: async (): Promise<Diary[]> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const userId = getCurrentUserId();
-      const diaries = getMockDiaries();
-      return diaries.filter(d => d.authorEmail === userId);
-    }
-
     const response = await fetch(API_BASE, { headers: getHeaders() });
     if (!response.ok) {
       throw new Error('일기 목록을 불러오는 데 실패했습니다.');
@@ -83,16 +37,6 @@ export const diaryApi = {
 
   // 키워드 기반 일기 검색
   search: async (keyword: string): Promise<Diary[]> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const userId = getCurrentUserId();
-      const diaries = getMockDiaries();
-      return diaries.filter(d => 
-        d.authorEmail === userId && 
-        (d.diaryTitle.includes(keyword) || d.diaryContent.includes(keyword))
-      );
-    }
-
     const response = await fetch(`${API_BASE}/search?keyword=${encodeURIComponent(keyword)}`, { headers: getHeaders() });
     if (!response.ok) {
       throw new Error('일기 검색에 실패했습니다.');
@@ -102,33 +46,6 @@ export const diaryApi = {
 
   // 신규 일기 생성
   create: async (diary: Diary, imageFile?: File | null): Promise<Diary> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      const userId = getCurrentUserId();
-      const diaries = getMockDiaries();
-      
-      let imageUrl = '';
-      if (imageFile) {
-        try {
-          imageUrl = await fileToBase64(imageFile);
-        } catch (e) {
-          console.error('Image encoding failed:', e);
-        }
-      }
-      
-      const newDiary: Diary = {
-        ...diary,
-        diaryId: `mock-diary-${Date.now()}`,
-        authorEmail: userId,
-        attachedPhotoUrl: imageUrl,
-        writtenDate: diary.writtenDate || new Date().toISOString().split('T')[0]
-      };
-      
-      diaries.unshift(newDiary);
-      localStorage.setItem('mock_diaries', JSON.stringify(diaries));
-      return newDiary;
-    }
-
     const formData = new FormData();
     formData.append('diary', new Blob([JSON.stringify(diary)], { type: 'application/json' }));
     if (imageFile) {
@@ -149,37 +66,6 @@ export const diaryApi = {
 
   // 기존 일기 정보 수정
   update: async (id: string, diary: Diary, imageFile?: File | null): Promise<Diary> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      const diaries = getMockDiaries();
-      const index = diaries.findIndex(d => d.diaryId === id);
-      
-      if (index === -1) {
-        throw new Error('해당 일기를 찾을 수 없습니다.');
-      }
-      
-      let imageUrl = diaries[index].attachedPhotoUrl;
-      if (imageFile) {
-        try {
-          imageUrl = await fileToBase64(imageFile);
-        } catch (e) {
-          console.error('Image encoding failed:', e);
-        }
-      } else if (imageFile === null) {
-        imageUrl = '';
-      }
-      
-      const updatedDiary: Diary = {
-        ...diaries[index],
-        ...diary,
-        attachedPhotoUrl: imageUrl,
-      };
-      
-      diaries[index] = updatedDiary;
-      localStorage.setItem('mock_diaries', JSON.stringify(diaries));
-      return updatedDiary;
-    }
-
     const formData = new FormData();
     formData.append('diary', new Blob([JSON.stringify(diary)], { type: 'application/json' }));
     if (imageFile) {
@@ -200,14 +86,6 @@ export const diaryApi = {
 
   // 지정 일기 삭제
   delete: async (id: string): Promise<void> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      const diaries = getMockDiaries();
-      const filtered = diaries.filter(d => d.diaryId !== id);
-      localStorage.setItem('mock_diaries', JSON.stringify(filtered));
-      return;
-    }
-
     const response = await fetch(`${API_BASE}/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
@@ -215,76 +93,5 @@ export const diaryApi = {
     if (!response.ok) {
       throw new Error('일기 삭제에 실패했습니다.');
     }
-  },
-
-  // 시스템 전체 데이터 및 이미지 백업
-  backup: async (): Promise<Blob> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const diaries = getMockDiaries();
-      const userId = getCurrentUserId();
-      const userDiaries = diaries.filter(d => d.authorEmail === userId);
-      const dataStr = JSON.stringify(userDiaries, null, 2);
-      return new Blob([dataStr], { type: 'application/json' });
-    }
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/backup`, {
-      headers: getMultipartHeaders(),
-    });
-    if (!response.ok) {
-      throw new Error('백업 데이터 다운로드에 실패했습니다.');
-    }
-    return response.blob();
-  },
-
-  // 업로드 파일 기반 데이터 시스템 복원
-  restore: async (file: File): Promise<string> => {
-    if (isMock()) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsText(file);
-        reader.onload = () => {
-          try {
-            const restoredDiaries = JSON.parse(reader.result as string);
-            if (!Array.isArray(restoredDiaries)) {
-              throw new Error('유효하지 않은 백업 형식입니다.');
-            }
-            
-            const diaries = getMockDiaries();
-            const userId = getCurrentUserId();
-            const otherUsersDiaries = diaries.filter(d => d.authorEmail !== userId);
-            
-            const processedRestored = restoredDiaries.map((d: any) => ({
-              ...d,
-              authorEmail: userId,
-              diaryId: d.diaryId || `mock-diary-${Math.random().toString(36).substr(2, 9)}`,
-            }));
-            
-            const merged = [...processedRestored, ...otherUsersDiaries];
-            localStorage.setItem('mock_diaries', JSON.stringify(merged));
-            resolve('백업 파일이 성공적으로 복원되었습니다.');
-          } catch (e) {
-            reject(new Error('백업 파일 파싱에 실패했습니다. 올바른 백업 파일인지 확인해주세요.'));
-          }
-        };
-        reader.onerror = () => reject(new Error('파일을 읽는 도중 오류가 발생했습니다.'));
-      });
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/restore`, {
-      method: 'POST',
-      headers: getMultipartHeaders(),
-      body: formData,
-    });
-    const message = await response.text();
-    if (!response.ok) {
-      throw new Error(message || '백업 복원에 실패했습니다.');
-    }
-    return message;
   }
 };
-
-
