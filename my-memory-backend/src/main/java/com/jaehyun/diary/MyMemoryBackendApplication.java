@@ -3,12 +3,12 @@ package com.jaehyun.diary;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-// MyMemory 백엔드 애플리케이션 실행 메인 진입점(Entry Point)
+// 메인 진입점
 @SpringBootApplication
 public class MyMemoryBackendApplication {
 
     static {
-        // 로컬 실행환경 지원을 위해 .env 파일 로드 및 시스템 프로퍼티 등록
+        // 로컬 환경을 위한 .env 파일 로드
         java.io.File envFile = new java.io.File("../.env");
         if (!envFile.exists()) {
             envFile = new java.io.File(".env");
@@ -18,6 +18,7 @@ public class MyMemoryBackendApplication {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
+                    // 주석(#)을 제외하고 key=value 포맷을 추출하여 시스템 프로퍼티로 설정
                     if (!line.isEmpty() && !line.startsWith("#") && line.contains("=")) {
                         String[] parts = line.split("=", 2);
                         String key = parts[0].trim();
@@ -32,10 +33,7 @@ public class MyMemoryBackendApplication {
         }
     }
 
-    // 애플리케이션 부트스트랩 및 내장 웹 서버 실행
-    // param: args - 실행 시 커맨드 라인에서 전달된 인자 배열
     public static void main(String[] args) {
-        // SpringApplication.run()을 통해 컨테이너 생명주기가 시작됨
         SpringApplication.run(MyMemoryBackendApplication.class, args);
     }
 }

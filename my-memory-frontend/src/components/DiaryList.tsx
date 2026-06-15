@@ -2,7 +2,7 @@ import React from 'react';
 import type { Diary } from '../types/diary';
 import DiaryItem from './DiaryItem';
 
-// DiaryList 컴포넌트 주입 프로퍼티 구조 선언
+// DiaryList Props 정의
 interface DiaryListProps {
   diaries: Diary[];
   fetchLoading: boolean;
@@ -11,10 +11,7 @@ interface DiaryListProps {
   onView: (diary: Diary) => void;
 }
 
-// 다수 일기 레코드 목록(List) 구조 렌더링 컨테이너 컴포넌트
-// DiaryItem 하위 엔티티 생성 위임 및 순회 DOM 구성
-// param: 렌더링 대상 일기 배열, 로딩 상태 및 항목 액션 콜백
-// return: DiaryItem 목록 또는 데이터 부재 빈 상태(Empty State) 레이아웃
+// 일기 목록 컴포넌트
 const DiaryList: React.FC<DiaryListProps> = ({ diaries, fetchLoading, onEdit, onDelete, onView }) => {
   if (diaries.length === 0 && !fetchLoading) {
     return (

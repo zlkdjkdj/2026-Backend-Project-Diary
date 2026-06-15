@@ -1,6 +1,6 @@
 import React from 'react';
 
-// SearchFilter 컴포넌트 상태 및 콜백 속성 정의
+// SearchFilter Props 정의
 interface SearchFilterProps {
   searchKeyword: string;
   setSearchKeyword: (val: string) => void;
@@ -13,9 +13,7 @@ interface SearchFilterProps {
   fetchLoading: boolean;
 }
 
-// 사용자 입력 다중 조건(텍스트, 날짜, 이미지 첨부) 목록 필터링 컴포넌트
-// param: 검색 파라미터 양방향 바인딩 상태 변수 및 콜백
-// return: 필터 폼 UI JSX 요소
+// 검색 필터 컴포넌트
 const SearchFilter: React.FC<SearchFilterProps> = ({
   searchKeyword,
   setSearchKeyword,

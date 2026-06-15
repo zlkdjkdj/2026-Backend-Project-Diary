@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { type Diary } from '../types/diary';
 import { getImageUrl } from '../api/apiConfig';
 
-// DiaryForm 컴포넌트 프로퍼티 타입 정의
+// DiaryForm Props 정의
 interface DiaryFormProps {
   initialData?: Diary;
   isEditing: boolean;
@@ -11,7 +11,7 @@ interface DiaryFormProps {
   actionLoading: boolean;
 }
 
-// Helper to safely get timezone-aware local date string (YYYY-MM-DD)
+// 로컬 날짜 문자열 획득 (YYYY-MM-DD)
 const getLocalDateString = (dateInput?: string) => {
   if (dateInput) {
     return dateInput.split('T')[0];
@@ -23,10 +23,7 @@ const getLocalDateString = (dateInput?: string) => {
   return `${year}-${month}-${day}`;
 };
 
-// 신규 작성 및 기존 일기 수정용 입력 폼(Form) 컴포넌트
-// 텍스트 데이터 및 멀티파트 이미지 파일 클라이언트 상태 관리
-// param: 초기 데이터, 수정 여부, 액션 콜백 및 로딩 상태
-// return: 폼 요소 및 상태 컨트롤 JSX 레이아웃
+// 일기 작성/수정 폼 컴포넌트
 const DiaryForm: React.FC<DiaryFormProps> = ({
   initialData,
   isEditing,
@@ -34,7 +31,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
   onCancel,
   actionLoading,
 }) => {
-  // 입력 필드의 상태 관리
+  // 입력 필드 상태
   const [title, setTitle] = useState(initialData?.diaryTitle || '');
   const [content, setContent] = useState(initialData?.diaryContent || '');
 

@@ -23,7 +23,7 @@ public class S3Config {
     @Bean
     public S3Client s3Client() {
         if (accessKey == null || accessKey.isEmpty() || secretKey == null || secretKey.isEmpty()) {
-            // AWS 키가 없을 경우 (초기 설정 전) 애플리케이션이 뻗지 않도록 기본 클라이언트 생성 시도
+            // AWS 자격 증명이 없을 경우 기본 클라이언트 반환
             return S3Client.builder().region(Region.of(region)).build();
         }
 

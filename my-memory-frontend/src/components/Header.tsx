@@ -1,15 +1,12 @@
 import React from 'react';
 
-// Header 컴포넌트 주입 프로퍼티 구조 정의
+// Header Props 정의
 interface HeaderProps {
   currentUser: { email: string; nickname: string } | null;
   onLogout: () => void;
 }
 
-// 최상단 글로벌 네비게이션 바(GNB) 컴포넌트
-// 서비스 브랜딩, 로그인 사용자 컨텍스트 및 시스템 액션(백업/복원/로그아웃) 제공
-// param: 사용자 인증 정보 및 상단 제어 기능 바인딩 콜백
-// return: 헤더 영역 구성 JSX 요소
+// 헤더 컴포넌트
 const Header: React.FC<HeaderProps> = ({
   currentUser,
   onLogout,
