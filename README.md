@@ -1,8 +1,6 @@
 # My Memory - 일기 및 메모 보관 서비스
 
-이 프로젝트는 React(프론트엔드)와 Spring Boot 및 MongoDB(백엔드)를 활용하여 구현한 개인 일기장 애플리케이션입니다. 사용자 인증(JWT), 이미지 업로드, 그리고 백업 및 복원 기능을 제공합니다.
-
-이 프로젝트는 백엔드와 연결되지 않은 상태에서도 프론트엔드에서 로컬 저장소 기반의 Mocking 모드로 구동 가능하며, 설정 변경을 통해 실제 MongoDB Atlas 데이터베이스 환경과 연결할 수 있습니다.
+이 프로젝트는 React(프론트엔드)와 Spring Boot 및 MongoDB(백엔드)를 활용하여 구현한 개인 일기장 애플리케이션입니다. 사용자 인증(JWT), AWS S3 기반 이미지 업로드, 날짜 및 키워드 기반 일기 검색/필터링 기능을 제공합니다.
 
 ---
 
@@ -10,172 +8,160 @@
 
 ```text
 my-memory/
+├── database_schema.md             # MongoDB 데이터베이스 정의 문서 (스키마 및 ERD 명세)
+├── DB구조 제출본.pdf                 # MongoDB 데이터베이스 관계 정의 PDF 보고서
 ├── my-memory-frontend/            # 프론트엔드 (React + TypeScript + Vite)
 │   ├── src/
-│   │   ├── api/                   # API 통신 계층 (백엔드 통신 및 Mocking 스위칭 제공)
-│   │   │   ├── apiConfig.ts       # Mocking 사용 여부 감지 및 Axios 공통 인스턴스 설정
-│   │   │   ├── authApi.ts         # 로그인/회원가입 API (Mock / Real)
-│   │   │   └── diaryApi.ts        # 일기 생성/수정/삭제/검색 API (Mock / Real)
+│   │   ├── api/                   # API 통신 계층
+│   │   │   ├── apiConfig.ts       # Axios 공통 인스턴스 및 Base URL 설정
+│   │   │   ├── authApi.ts         # 로그인/회원가입 API 통신 모듈
+│   │   │   └── diaryApi.ts        # 일기 생성/수정/삭제/검색 API 통신 모듈
 │   │   │
 │   │   ├── components/            # UI 컴포넌트 레이어
-│   │   │   ├── DiaryCard.tsx      # 일기 카드 아이템 레이아웃 및 테마 적용
-│   │   │   ├── DiaryDetailModal.tsx # 일기 세부 본문 및 이미지 뷰어
-│   │   │   ├── DiaryFormModal.tsx # 일기 작성 및 수정 폼
-│   │   │   └── GoogleDriveWidget.tsx # 백업 파일 저장용 클라우드 위젯 UI
+│   │   │   ├── DiaryDetailModal.tsx # 일기 세부 본문 및 이미지 뷰어 모달
+│   │   │   ├── DiaryForm.tsx      # 일기 작성 및 수정 입력 폼 컴포넌트
+│   │   │   ├── DiaryItem.tsx      # 일기 목록 카드 아이템 컴포넌트
+│   │   │   ├── DiaryList.tsx      # 일기 목록 컨테이너 컴포넌트
+│   │   │   ├── Header.tsx         # 글로벌 상단 내비게이션 헤더 컴포넌트
+│   │   │   └── SearchFilter.tsx   # 키워드, 날짜, 이미지 필터링 검색 바 컴포넌트
 │   │   │
 │   │   ├── pages/                 # 라우터 페이지 컴포넌트
 │   │   │   ├── LoginPage.tsx      # 로그인 화면
 │   │   │   ├── RegisterPage.tsx   # 회원가입 화면
-│   │   │   └── MainPage.tsx       # 일기 목록, 필터링, 검색 및 백업 관리 화면
+│   │   │   └── MainPage.tsx       # 일기 관리 메인 대시보드 화면 (목록, 필터, CRUD 이벤트 연동)
 │   │   │
-│   │   ├── types/                 # 공통 TypeScript 타입 선언
-│   │   │   └── diary.ts           # Diary 데이터 규격 인터페이스 및 Auth DTO 포맷
+│   │   ├── types/                 # 공통 TypeScript 타입 정의
+│   │   │   └── diary.ts           # Diary 도메인 데이터 모델 인터페이스 명세
 │   │   │
-│   │   ├── App.tsx                # 라우터 처리, 상태 보존 및 글로벌 내비게이션 바
-│   │   ├── index.css              # 전역 스타일 및 테마 변수 바인딩
-│   │   └── main.tsx               # 애플리케이션 엔트리 포인트
-│   └── vite.config.ts             # 프론트엔드 설정 및 프록시 설정
+│   │   ├── App.tsx                # 라우터 및 글로벌 상태 관리 컴포넌트
+│   │   ├── index.css              # 전역 CSS 및 디자인 시스템 설정 (CSS 변수)
+│   │   └── main.tsx               # React 애플리케이션 엔트리 포인트
+│   └── vite.config.ts             # Vite 설정 파일
 │
 └── my-memory-backend/             # 백엔드 (Spring Boot + MongoDB Atlas)
-    ├── Dockerfile                 # 도커 이미지 배포용 설정 파일
-    ├── build.gradle               # Gradle 의존성 및 프로젝트 빌드 설정
-    ├── settings.gradle            # Gradle 프로젝트 세팅 설정
+    ├── Dockerfile                 # 도커 컨테이너 배포 설정 파일
+    ├── build.gradle               # Gradle 의존성 및 프로젝트 빌드 구성
+    ├── settings.gradle            # Gradle 멀티프로젝트 관리 설정
     ├── gradlew / gradlew.bat      # Gradle 래퍼 실행 스크립트
     ├── src/
     │   ├── main/
     │   │   ├── java/com/jaehyun/diary/
-    │   │   │   ├── MyMemoryBackendApplication.java # Spring Boot 메인 진입점
-    │   │   │   ├── api/                   # REST API 컨트롤러 레이어
-    │   │   │   │   ├── AuthApiController.java     # 회원가입 및 로그인 처리
-    │   │   │   │   ├── DiaryApiController.java    # 일기 등록/수정/삭제/검색 처리
-    │   │   │   │   └── BackupApiController.java   # 데이터 백업 및 복원 기능
+    │   │   │   ├── MyMemoryBackendApplication.java # Spring Boot 메인 어플리케이션 진입점 (.env 동적 로더 포함)
+    │   │   │   ├── api/                   # REST API 컨트롤러 계층
+    │   │   │   │   ├── AuthApiController.java     # 회원가입 및 로그인 처리 API
+    │   │   │   │   └── DiaryApiController.java    # 일기 생성/조회/수정/삭제/검색 처리 API
     │   │   │   │
-    │   │   │   ├── dto/                   # 데이터 전송 객체 (DTO) 레이어
-    │   │   │   │   ├── DiaryForm.java             # 일기 생성/수정 데이터 교환용 DTO
+    │   │   │   ├── dto/                   # 데이터 전송 객체 (DTO) 계층
+    │   │   │   │   ├── DiaryForm.java             # 일기 입출력 데이터 전달 DTO
     │   │   │   │   └── AuthForm.java              # 로그인/회원가입 요청 및 응답 DTO
     │   │   │   │
-    │   │   │   ├── entity/                # MongoDB 도메인 엔티티 레이어
-    │   │   │   │   ├── DiaryEntity.java           # 일기 데이터베이스 매핑 모델
-    │   │   │   │   ├── UserEntity.java            # 사용자 데이터베이스 매핑 모델
-    │   │   │   │   └── UserRole.java              # 권한 분류 열거형 (USER, ADMIN)
+    │   │   │   ├── entity/                # MongoDB 영속성 엔티티 계층
+    │   │   │   │   ├── DiaryEntity.java           # 일기 도메인 DB 매핑 객체
+    │   │   │   │   ├── UserEntity.java            # 사용자 정보 DB 매핑 객체
+    │   │   │   │   └── UserRole.java              # 인가 역할 정의 (USER, ADMIN)
     │   │   │   │
-    │   │   │   ├── repository/            # 데이터 액세스 인터페이스 레이어
-    │   │   │   │   ├── DiaryRepository.java       # 일기 쿼리 인터페이스
-    │   │   │   │   └── UserRepository.java        # 사용자 조회 인터페이스
+    │   │   │   ├── repository/            # 데이터 액세스 인터페이스 계층
+    │   │   │   │   ├── DiaryRepository.java       # 일기 컬렉션 DB 쿼리 인터페이스
+    │   │   │   │   └── UserRepository.java        # 회원 정보 컬렉션 DB 쿼리 인터페이스
     │   │   │   │
-    │   │   │   ├── service/               # 비즈니스 로직 레이어
-    │   │   │   │   ├── DiaryService.java          # 일기 관련 비즈니스 로직
-    │   │   │   │   ├── AuthService.java           # 사용자 인증 및 토큰 발급
-    │   │   │   │   ├── FileService.java           # 업로드 파일 로컬 저장 및 처리
-    │   │   │   │   └── BackupService.java         # 백업 파일 생성 및 복원 처리
+    │   │   │   ├── service/               # 핵심 비즈니스 로직 계층
+    │   │   │   │   ├── DiaryService.java          # 일기 등록/수정/삭제 비즈니스 로직
+    │   │   │   │   ├── AuthService.java           # 사용자 인증, 비밀번호 암호화 및 토큰 처리
+    │   │   │   │   └── FileService.java           # AWS S3 파일 업로드 및 링크 생성 비즈니스 로직
     │   │   │   │
-    │   │   │   └── config/                # 설정 및 보안 설정
+    │   │   │   └── config/                # 글로벌 인프라 및 보안 설정
     │   │   │       ├── MongoConfig.java           # MongoDB 연결 설정
-    │   │   │       ├── WebConfig.java             # 정적 자원 매핑 설정
-    │   │   │       ├── SecurityConfig.java        # 스프링 시큐리티 인가 설정
-    │   │   │       ├── JwtFilter.java             # JWT 검증 및 인가 필터
-    │   │   │       ├── JwtUtil.java               # JWT 생성 및 파싱
-    │   │   │       ├── GlobalExceptionHandler.java # 전역 예외 처리 핸들러
-    │   │   │       ├── CheckOwnership.java        # 작성자 검증용 커스텀 어노테이션
-    │   │   │       └── OwnershipAspect.java       # 소유권 검증 AOP 구현체
+    │   │   │       ├── S3Config.java              # AWS S3 클라이언트 빈(Bean) 등록 설정
+    │   │   │       ├── SecurityConfig.java        # Spring Security 및 CORS 인가/예외 처리 설정
+    │   │   │       ├── JwtFilter.java             # JWT 유효성 검증 필터
+    │   │   │       ├── JwtUtil.java               # JWT 빌더 및 복호화 유틸리티
+    │   │   │       ├── GlobalExceptionHandler.java # REST API 공통 예외 처리 컨트롤러 어드바이스
+    │   │   │       ├── CheckOwnership.java        # 소유권 검증용 AOP 어노테이션 정의
+    │   │   │       └── OwnershipAspect.java       # 소유권 검증 Aspect 구현체 (AOP)
     │   │   │
-    │   │   └── resources/             # 설정 및 정적 자원 폴더
-    │   │       ├── application.yml                 # DB 연결 및 JWT 설정 정보
-    │   │       ├── static/                         # 정적 자원 폴더 (기본 빈 폴더)
-    │   │       └── templates/                      # 템플릿 폴더 (기본 빈 폴더)
+    │   │   └── resources/             # 정적 리소스 및 어플리케이션 환경 정보
+    │   │       └── application.yml                 # DB 정보 및 포트 설정
     │   │
-    │   ├── test/                      # 백엔드 단위/통합 테스트 폴더
+    │   ├── test/                      # 통합/단위 테스트 디렉토리
     │   │   └── java/com/jaehyun/diary/
-    │   │       ├── MyMemoryBackendApplicationTests.java # 스프링 부트 로드 테스트
+    │   │       ├── S3ConnectionTest.java           # S3 업로드, Mongo 쿼리 및 JWT 인증 API 통합 검증 테스트
     │   │       └── service/
-    │   │           └── DiaryServiceTest.java           # 일기 서비스 테스트
+    │   │           └── DiaryServiceTest.java       # 일기 관리 서비스 유닛 테스트
     │   │
-    │   └── test.http                  # HTTP API 수동 요청 테스트 파일
-    │
-    └── uploads/                   # 업로드된 이미지 파일 저장 경로 (동적 생성)
+    │   └── test.http                  # HTTP API 수동 검증용 테스트 스크립트
 ```
 
 ---
 
 ## 프론트엔드 구조 및 비즈니스 로직 설명
 
-프론트엔드는 Mocking 모드와 API 연동 모드로 전환 가능한 구조로 구현되었습니다.
+프론트엔드는 모던한 UI와 반응형 다크 모드, 그리고 편리한 일기 필터링 시스템을 갖추고 있습니다.
 
-### 1. Mocking 및 API 연동 전환 로직
-*   **설정 (`apiConfig.ts`)**:
-    *   브라우저의 `localStorage.getItem('use_mock')` 값에 따라 Mocking 여부를 결정합니다.
-    *   API 연동 모드로 전환하려면 콘솔에서 다음 스크립트를 실행 후 새로고침합니다.
-        ```javascript
-        localStorage.setItem('use_mock', 'false');
-        ```
-*   **인증 흐름 (`authApi.ts`)**:
-    *   Mock 모드: `localStorage`의 `mock_users` 배열을 사용하여 회원가입 및 로그인을 시뮬레이션하고 임의의 JWT를 반환합니다.
-    *   API 연동 모드: 백엔드의 `/api/auth/login`, `/api/auth/register` 엔드포인트로 HTTP 통신을 수행합니다.
-*   **일기 기능 흐름 (`diaryApi.ts`)**:
-    *   Mock 모드: 일기 데이터는 `localStorage`의 `mock_diaries` 배열에서 관리하며, 이미지는 `FileReader` API를 통해 Base64 인코딩하여 저장합니다.
-    *   API 연동 모드: HTTP 헤더에 JWT를 포함하여 백엔드의 `/api/diary` 엔드포인트와 통신합니다.
+### 1. API 통신 및 토큰 저장
+- **인증 토큰 보존**: 사용자가 로그인에 성공하면 발급된 JWT 토큰은 `localStorage`의 `token` 키에 저장됩니다.
+- **인증 인터셉트**: [diaryApi.ts](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/api/diaryApi.ts) 모듈에서 서버에 API 요청을 보낼 때, 헤더에 자동으로 `Authorization: Bearer <Token>` 포맷으로 주입하여 요청합니다.
 
 ### 2. 주요 UI 컴포넌트
-*   **상태 관리 (`App.tsx` & `MainPage.tsx`)**:
-    *   사용자의 인증 상태와 모달 표시 여부를 React State로 관리합니다.
-    *   로그인 완료 시 `MainPage`로 이동하여 데이터를 조회합니다.
-*   **일기 상세 조회 (`DiaryCard.tsx` & `DiaryDetailModal.tsx`)**:
-    *   일기의 감정 상태에 따라 카드 테마 색상이 동적으로 적용됩니다.
-    *   카드 클릭 시 `DiaryDetailModal`을 통해 상세 내용과 첨부 이미지를 확인할 수 있습니다.
+- **일기 리스트 & 상세 모달**: 
+  - [DiaryItem.tsx](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/components/DiaryItem.tsx)를 통해 일기를 반응형 카드로 렌더링하며, 클릭하면 상세 뷰를 보여주는 [DiaryDetailModal.tsx](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/components/DiaryDetailModal.tsx)가 활성화됩니다.
+- **일기 필터 및 날짜 검색**:
+  - [SearchFilter.tsx](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/components/SearchFilter.tsx) 컴포넌트는 키워드 검색, 날짜 검색(현지 타임존 보정), 이미지 포함 여부 필터링 조건을 제공합니다.
+  - [MainPage.tsx](file:///Users/kil07201/Desktop/my-memory/my-memory-frontend/src/pages/MainPage.tsx)에서 사용자가 필터링 조건을 변경하면 실시간으로 클라이언트 사이드에서 검색 결과를 절삭하여 보여줍니다.
+- **날짜 타임존 안정성**:
+  - 한국(KST) 오전 시간대에 일기를 작성하더라도 UTC 오차로 인해 어제 날짜로 저장되거나 검색되지 않던 현상을 해결하기 위해 브라우저의 현지 날짜를 YYYY-MM-DD로 정확히 파싱해 전송합니다.
 
 ---
 
 ## 백엔드 구조 및 비즈니스 로직 설명
 
-백엔드는 RESTful API 규격에 맞춘 계층형 아키텍처로 구현되었습니다.
+백엔드는 대용량 파일 저장에 유리한 **AWS S3**와 확장성이 뛰어난 **MongoDB Atlas**를 연동하여 동작합니다.
 
-### 1. 사용자 인증 로직
-*   **회원가입 (`POST /api/auth/register`)**
-    *   `UserRepository`를 통해 이메일 중복 여부를 확인합니다.
-    *   `BCryptPasswordEncoder`를 사용하여 비밀번호를 해시 암호화한 후 저장합니다.
-*   **로그인 (`POST /api/auth/login`)**
-    *   사용자 존재 여부를 확인하고, 입력된 비밀번호와 해시된 비밀번호를 대조합니다.
-    *   검증이 완료되면 `JwtUtil`을 통해 JWT(Access Token)를 발급하여 반환합니다.
-*   **보안 필터링**
-    *   `JwtFilter.java`: `OncePerRequestFilter`를 상속받아 HTTP 요청의 `Authorization` 헤더에서 JWT를 추출하고 유효성을 검증합니다.
-    *   `SecurityConfig.java`: 인증 관련 경로(`/api/auth/**`) 및 정적 파일 경로(`/uploads/**`)를 제외한 모든 API 접근에 대해 인증을 요구합니다.
+### 1. 사용자 인증 및 보안
+- **회원가입 (`POST /api/auth/register`)**: 이메일 중복 여부를 감지하고, `BCryptPasswordEncoder`로 단방향 비밀번호 해시 처리를 거쳐 저장합니다.
+- **로그인 (`POST /api/auth/login`)**: 비밀번호 대조가 성공하면 만료 시간 30분의 JWT 토큰을 발행합니다.
+- **인증 보장 (`JwtFilter.java` & `SecurityConfig.java`)**: `SecurityConfig`에 명시된 예외 허용 경로(`/api/auth/**`)를 제외한 모든 자원에 접근할 때 JWT 필터를 반드시 거쳐 사용자를 식별합니다.
 
-### 2. 일기(Diary) CRUD 로직
-*   **일기 등록 (`POST /api/diary`)**
-    *   이미지 파일이 포함된 경우 `FileService`를 통해 고유 파일명(UUID)으로 `uploads/` 폴더에 저장하고 URL 경로를 반환합니다.
-    *   사용자의 인증 정보를 바탕으로 `DiaryEntity`를 생성하여 데이터베이스에 저장합니다.
-*   **일기 수정 (`PUT /api/diary/{id}`)**
-    *   요청한 사용자가 해당 일기의 작성자인지 검증합니다. 권한이 일치하지 않을 경우 예외를 반환합니다.
-    *   새로운 이미지가 업로드된 경우 기존 파일을 대체하고 데이터를 업데이트합니다.
-
-### 3. 데이터 백업 및 복원 로직
-*   **데이터 백업 (`GET /api/backup`)**
-    *   임시 디렉토리를 생성하여 일기 데이터를 `backup.json`으로 내보냅니다.
-    *   `uploads/` 폴더에 존재하는 이미지 파일들을 `images.zip`으로 압축합니다.
-    *   위 두 파일을 병합하여 하나의 ZIP 파일(`diary_backup.zip`)로 구성한 후 사용자에게 다운로드 스트림으로 전송합니다. 전송 완료 후 임시 파일은 삭제됩니다.
-*   **데이터 복원 (`POST /api/restore`)**
-    *   기존 데이터베이스와 업로드된 파일을 임시 백업 폴더로 이동시킵니다.
-    *   기존 컬렉션을 초기화(`diaryRepository.deleteAll()`)하고, 복원용 ZIP 파일의 데이터와 이미지를 적용합니다.
-    *   복원 중 에러가 발생할 경우, 작업 내역을 취소하고 임시 저장된 기존 데이터로 롤백(Rollback)하여 시스템 일관성을 유지합니다.
+### 2. 일기(Diary) CRUD 및 파일 저장 서비스
+- **AWS S3 업로드 (`FileService.java`)**:
+  - 일기 작성 또는 수정 시 이미지가 첨부되면, Spring Boot가 이를 바이트 어레이 스트림 형태로 주입받아 AWS S3 버킷에 난수화된 키로 직접 전송(Upload)합니다.
+  - 업로드가 정상 종료되면 해당 S3 객체의 절대 URL을 생성하여 `attachedPhotoUrl`로 영속화합니다.
+- **소유권 검증 (AOP - `@CheckOwnership`)**:
+  - 일기 수정/삭제 시 로그인한 사용자가 실제 일기를 작성했는지 여부를 서비스 호출 시 AOP(`OwnershipAspect.java`) 프록시가 가로채어 검증함으로써 강력한 보안 무결성을 보장합니다.
 
 ---
 
 ## 실행 및 테스트 방법
 
-프론트는 vercel, 백엔드는 render로 배포 되었습니다.
-https://2026-backend-project-diary.vercel.app
+현재 프론트엔드는 **Vercel**에, 백엔드는 **Render** 서비스에 호스팅되어 서비스가 구동 중입니다.
+- **Vercel 배포 URL**: `https://2026-backend-project-diary.vercel.app`
 
-### 1. 백엔드 실행
+### 1. 환경변수 설정
+프로젝트 루트 폴더에 `.env` 파일을 생성하고 아래의 정보들을 입력해야 정상적으로 빌드 및 실행이 가능합니다.
+```env
+# MongoDB Atlas 주소
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/my-database
+# JWT 암호화 키
+JWT_SECRET=mySuperSecretKeyThatIsAtLeast256BitsLongForHmacSHA
+# AWS S3 자격 증명
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+AWS_REGION=ap-northeast-2
+AWS_S3_BUCKET=your-bucket-name
+# 프론트엔드 환경변수 (Vite 호스팅 시 백엔드 엔드포인트 URL 지정)
+VITE_API_URL=http://localhost:8089
+```
+
+### 2. 백엔드 실행
 백엔드 디렉토리(`my-memory-backend`)에서 아래 명령어를 실행합니다.
 ```bash
 ./gradlew bootRun
 ```
-백엔드 서버는 기본적으로 `http://localhost:8089`에서 실행됩니다.
+백엔드 서버는 기본적으로 `http://localhost:8089` 포트에서 가동됩니다.
 
-### 2. 프론트엔드 실행
-프론트엔드 디렉토리(`my-memory-frontend`)에서 패키지를 설치하고 개발 서버를 실행합니다.
+### 3. 프론트엔드 실행
+프론트엔드 디렉토리(`my-memory-frontend`)에서 패키지를 설치하고 개발용 Vite 서버를 시작합니다.
 ```bash
 npm install
 npm run dev
 ```
-프론트엔드 서버는 `http://localhost:5173`에서 실행되며, API(`/api`) 및 업로드 파일(`/uploads`) 요청은 Vite 프록시 설정을 통해 백엔드 서버로 라우팅됩니다.
+프론트엔드 서버는 `http://localhost:5173` 포트에서 실행되며, API(`/api`) 요청은 Vite 프록시 설정을 통해 백엔드로 정상적으로 프록시 통신을 수행합니다.
