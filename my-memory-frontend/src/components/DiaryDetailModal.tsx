@@ -23,7 +23,7 @@ const DiaryDetailModal: React.FC<DiaryDetailModalProps> = ({ diary, onClose }) =
           <div className="flex items-center gap-2.5">
             <div>
               <span className="text-[11px] font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider block">
-                {diary.writtenDate || '날짜 없음'}
+                {diary.writtenDate ? diary.writtenDate.split('T')[0] : '날짜 없음'}
               </span>
             </div>
           </div>

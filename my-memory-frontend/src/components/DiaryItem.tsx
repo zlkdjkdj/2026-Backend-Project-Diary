@@ -41,7 +41,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }
               <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium">{diary.authorEmail}</span>
               <span className="text-xs text-gray-300 dark:text-neutral-700 font-medium">|</span>
               <span className="text-xs text-gray-400 dark:text-neutral-500 font-medium">
-                {diary.writtenDate || '날짜 없음'}
+                {diary.writtenDate ? diary.writtenDate.split('T')[0] : '날짜 없음'}
               </span>
             </div>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
