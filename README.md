@@ -132,36 +132,6 @@ my-memory/
 
 ## 실행 및 테스트 방법
 
-현재 프론트엔드는 **Vercel**에, 백엔드는 **Render** 서비스에 호스팅되어 서비스가 구동 중입니다.
-- **Vercel 배포 URL**: `https://2026-backend-project-diary.vercel.app`
+본 프로젝트는 **Vercel**과 **Render** 서비스를 통해 배포 및 가동 중입니다. 아래의 배포 링크를 통해 테스트를 진행할 수 있습니다.
 
-### 1. 환경변수 설정
-프로젝트 루트 폴더에 `.env` 파일을 생성하고 아래의 정보들을 입력해야 정상적으로 빌드 및 실행이 가능합니다.
-```env
-# MongoDB Atlas 주소
-MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/my-database
-# JWT 암호화 키
-JWT_SECRET=mySuperSecretKeyThatIsAtLeast256BitsLongForHmacSHA
-# AWS S3 자격 증명
-AWS_ACCESS_KEY_ID=your-aws-access-key-id
-AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
-AWS_REGION=ap-northeast-2
-AWS_S3_BUCKET=your-bucket-name
-# 프론트엔드 환경변수 (Vite 호스팅 시 백엔드 엔드포인트 URL 지정)
-VITE_API_URL=http://localhost:8089
-```
-
-### 2. 백엔드 실행
-백엔드 디렉토리(`my-memory-backend`)에서 아래 명령어를 실행합니다.
-```bash
-./gradlew bootRun
-```
-백엔드 서버는 기본적으로 `http://localhost:8089` 포트에서 가동됩니다.
-
-### 3. 프론트엔드 실행
-프론트엔드 디렉토리(`my-memory-frontend`)에서 패키지를 설치하고 개발용 Vite 서버를 시작합니다.
-```bash
-npm install
-npm run dev
-```
-프론트엔드 서버는 `http://localhost:5173` 포트에서 실행되며, API(`/api`) 요청은 Vite 프록시 설정을 통해 백엔드로 정상적으로 프록시 통신을 수행합니다.
+- **배포 서비스 접속 링크 (Vercel)**: https://2026-backend-project-diary.vercel.app
