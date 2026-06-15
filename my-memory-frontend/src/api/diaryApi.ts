@@ -93,32 +93,5 @@ export const diaryApi = {
     if (!response.ok) {
       throw new Error('일기 삭제에 실패했습니다.');
     }
-  },
-
-  // 시스템 전체 데이터 및 이미지 백업
-  backup: async (): Promise<Blob> => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/backup`, {
-      headers: getMultipartHeaders(),
-    });
-    if (!response.ok) {
-      throw new Error('백업 데이터 다운로드에 실패했습니다.');
-    }
-    return response.blob();
-  },
-
-  // 업로드 파일 기반 데이터 시스템 복원
-  restore: async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/restore`, {
-      method: 'POST',
-      headers: getMultipartHeaders(),
-      body: formData,
-    });
-    const message = await response.text();
-    if (!response.ok) {
-      throw new Error(message || '백업 복원에 실패했습니다.');
-    }
-    return message;
   }
 };

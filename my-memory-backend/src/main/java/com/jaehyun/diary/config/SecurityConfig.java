@@ -51,8 +51,8 @@ public class SecurityConfig {
 
         // HTTP 요청 경로에 따른 접근 권한 설정
         http.authorizeHttpRequests(auth -> auth
-                // 회원가입, 로그인 등의 인증 API와 이미지 정적 자원(/uploads/**)은 로그인 없이 누구든 접근 가능(permitAll)
-                .requestMatchers("/api/auth/**", "/uploads/**").permitAll()
+                // 회원가입, 로그인 등의 인증 API는 로그인 없이 누구든 접근 가능(permitAll)
+                .requestMatchers("/api/auth/**").permitAll()
                 // 그 외의 모든 요청은 유효한 토큰 기반의 인증된(authenticated) 사용자만 접근 가능
                 .anyRequest().authenticated());
 

@@ -134,52 +134,6 @@ const MainPage: React.FC<MainPageProps> = ({
     setEditingDiary(undefined);
   };
 
-  // 사용자 전체 일기 및 이미지 데이터 ZIP 비동기 다운로드
-  const handleBackup = async () => {
-    if (!token) return;
-    setActionLoading(true);
-    try {
-      const blob = await diaryApi.backup();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `diary_backup_${new Date().toISOString().split('T')[0]}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      showAlert('백업 파일 다운로드가 완료되었습니다.');
-    } catch (err: any) {
-      showAlert(err.message || '백업 생성에 실패했습니다.', 'error');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // 업로드 ZIP 아카이브 서버 전송 및 시스템 상태 동기화(복원)
-  // param: 파일 입력 이벤트 객체
-  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!token) return;
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!window.confirm('정말 복원하시겠습니까? 기존의 모든 일기 데이터는 지워지고 백업 파일의 내용으로 대체됩니다.')) {
-      e.target.value = '';
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const msg = await diaryApi.restore(file);
-      showAlert(msg);
-      fetchDiaries();
-    } catch (err: any) {
-      showAlert(err.message || '복원 중 오류가 발생했습니다.', 'error');
-    } finally {
-      setActionLoading(false);
-      e.target.value = '';
-    }
-  };
 
   // 검색어 및 날짜 필터링 조건 초기화 및 목록 재렌더링
   const handleResetFilters = () => {
@@ -220,8 +174,6 @@ const MainPage: React.FC<MainPageProps> = ({
       <Header
         currentUser={currentUser}
         actionLoading={actionLoading}
-        onBackup={handleBackup}
-        onRestore={handleRestore}
         onLogout={onLogout}
       />
 
