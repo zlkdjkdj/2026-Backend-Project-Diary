@@ -173,7 +173,6 @@ const MainPage: React.FC<MainPageProps> = ({
     <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#0b0b0c] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col antialiased">
       <Header
         currentUser={currentUser}
-        actionLoading={actionLoading}
         onLogout={onLogout}
       />
 

@@ -3,7 +3,6 @@ import React from 'react';
 // Header 컴포넌트 주입 프로퍼티 구조 정의
 interface HeaderProps {
   currentUser: { email: string; nickname: string } | null;
-  actionLoading: boolean;
   onLogout: () => void;
 }
 
@@ -13,7 +12,6 @@ interface HeaderProps {
 // return: 헤더 영역 구성 JSX 요소
 const Header: React.FC<HeaderProps> = ({
   currentUser,
-  actionLoading,
   onLogout,
 }) => {
   return (
