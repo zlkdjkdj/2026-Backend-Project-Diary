@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@SuppressWarnings("null")
 class DiaryServiceTest {
 
     @Autowired

@@ -2,38 +2,32 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/authApi';
 
-// LoginPage 컴포넌트 프로퍼티 구조 정의 인터페이스
+// LoginPage Props 정의
 interface LoginPageProps {
   setToken: (token: string | null) => void;
   setCurrentUser: (user: { email: string; nickname: string } | null) => void;
 }
 
-// 사용자 인증 수행 로그인 페이지 컴포넌트
-// 자격 증명 검증 및 JWT 발급 상태 동기화 처리
-// param: 상태 변경 콜백 함수 (부모 컴포넌트 전달)
-// return: 로그인 폼 JSX 레이아웃
+// 로그인 페이지 컴포넌트
 const LoginPage: React.FC<LoginPageProps> = ({
   setToken,
   setCurrentUser,
 }) => {
   const navigate = useNavigate();
   
-  // 로그인 폼 입력값 및 UI 상태 관리
+  // 상태 관리
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  // 화면 일시적 에러 메시지 노출
-  // param: 출력 에러 문자열
+  // 에러 메시지 출력
   const showAlert = (msg: string) => {
     setAlertMessage(msg);
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // 폼 제출 이벤트 가로채기 및 비동기 로그인 요청 핸들러
-  // 인증 성공 시 홈 라우터('/') 리다이렉션 수행
-  // param: 폼 제출 DOM 이벤트
+  // 로그인 요청 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
@@ -85,7 +79,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
             </p>
           </div>
 
-          {/* 핵심 기능 카드 그리드 */}
+          {/* 핵심 기능 */}
           <div className="grid grid-cols-3 gap-3">
             <div className="p-4 bg-white dark:bg-neutral-900 border border-gray-200/50 dark:border-neutral-800 rounded-2xl shadow-xs">
               <span className="block text-xl mb-1.5">☁️</span>
@@ -104,7 +98,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           </div>
 
-          {/* 구글 드라이브 백업 및 복원 방법 안내 */}
+          {/* 백업 및 복원 가이드 */}
           <div className="bg-white dark:bg-neutral-900 border border-gray-200/60 dark:border-neutral-800/80 rounded-3xl p-6 space-y-4 shadow-xs">
             <h4 className="text-xs lg:text-sm font-bold text-gray-950 dark:text-white flex items-center gap-2">
               📂 구글 드라이브 활용 백업 & 복원 가이드
@@ -132,7 +126,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Wide Login Card */}
+        {/* 로그인 폼 */}
         <div className="lg:col-span-5 w-full flex justify-center lg:justify-end animate-in fade-in slide-in-from-right-4 duration-500">
           <div className="bg-white dark:bg-neutral-900 border border-gray-250/70 dark:border-neutral-800 rounded-3xl p-8 lg:p-12 shadow-lg w-full max-w-xl">
             <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-950 dark:text-white mb-8 text-center tracking-tight">

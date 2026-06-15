@@ -7,17 +7,14 @@ import DiaryDetailModal from '../components/DiaryDetailModal';
 import Header from '../components/Header';
 import SearchFilter from '../components/SearchFilter';
 
-// MainPage 컴포넌트 프로퍼티 타입 정의
+// MainPage Props 정의
 interface MainPageProps {
   token: string | null;
   currentUser: { email: string; nickname: string } | null;
   onLogout: () => void;
 }
 
-// 인증 사용자 접근 메인 뷰포트(Viewport) 컴포넌트
-// 일기 데이터 생명주기(CRUD) 및 상태 중앙 관리
-// param: 인증 토큰, 사용자 정보, 로그아웃 콜백
-// return: 메인 페이지 UI 렌더링 결과
+// 메인 페이지 컴포넌트
 const MainPage: React.FC<MainPageProps> = ({
   token,
   currentUser,
@@ -41,20 +38,15 @@ const MainPage: React.FC<MainPageProps> = ({
   // 상세 보기 모달 창 상태 관리
   const [viewingDiary, setViewingDiary] = useState<Diary | null>(null);
 
-  // 시스템 알림(Toast/Alert) 메시지 상태 관리
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-
-
-  // 화면 상단 일시 노출 알림 메시지 설정
-  // param: 출력 메시지 본문
-  // param: 알림 성격 ('success' | 'error')
+  // 알림 메시지 설정
   const showAlert = (text: string, type: 'success' | 'error' = 'success') => {
     setAlertMessage({ type, text });
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // 서버 API 연동 인증 사용자 전체 일기 데이터 비동기 조회
+  // 일기 데이터 조회
   const fetchDiaries = async () => {
     if (!token) return;
     setFetchLoading(true);
@@ -72,9 +64,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // 신규 생성 및 기존 수정 API 요청 처리
-  // param: 전송 일기 데이터
-  // param: 첨부 멀티파트 이미지 파일 (선택)
+  // 일기 저장 및 수정
   const handleSaveDiary = async (diary: Diary, imageFile: File | null) => {
     if (!token) return;
     setActionLoading(true);
@@ -95,8 +85,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // 지정 식별자 일기 데이터 삭제 요청
-  // param: 삭제 대상 일기 고유 ID
+  // 일기 삭제
   const handleDelete = async (id: string) => {
     if (!token) return;
     if (!window.confirm('정말로 이 일기를 삭제하시겠습니까?')) {
@@ -117,8 +106,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   };
 
-  // 선택 일기 데이터 폼 주입 및 수정 모드 전환
-  // param: 수정 대상 일기 객체
+  // 수정 시작
   const startEdit = (diary: Diary) => {
     if (!diary.diaryId) return;
     setIsEditing(true);
@@ -126,14 +114,14 @@ const MainPage: React.FC<MainPageProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 입력 폼 상태 초기화 및 신규 작성 모드 전환
+  // 폼 초기화
   const resetForm = () => {
     setIsEditing(false);
     setEditingDiary(undefined);
   };
 
 
-  // 검색어 및 날짜 필터링 조건 초기화 및 목록 재렌더링
+  // 필터 초기화
   const handleResetFilters = () => {
     setSearchKeyword('');
     setSearchDate('');
@@ -147,7 +135,7 @@ const MainPage: React.FC<MainPageProps> = ({
     }
   }, [token]);
 
-  // 메모리에 적재된 전체 일기 데이터를 기반으로 검색/필터링 로직을 수행합니다 (Client-side Filtering).
+  // 클라이언트 사이드 필터링
   const filteredDiaries = diaries.filter((diary) => {
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.toLowerCase();

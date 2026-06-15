@@ -2,7 +2,7 @@ import React from 'react';
 import { type Diary } from '../types/diary';
 import { getImageUrl } from '../api/apiConfig';
 
-// DiaryItem 컴포넌트 주입 프로퍼티 구조 정의
+// DiaryItem Props 정의
 interface DiaryItemProps {
   diary: Diary;
   onEdit: (diary: Diary) => void;
@@ -10,10 +10,7 @@ interface DiaryItemProps {
   onView: (diary: Diary) => void;
 }
 
-// 개별 일기 레코드 카드 아이템 컴포넌트
-// 썸네일, 제목, 본문 등 메타데이터 시각화 및 상호작용 제공
-// param: 단일 일기 객체 및 각 액션 매핑 콜백 함수들
-// return: 개별 항목 카드 UI 구성요소
+// 일기 아이템 컴포넌트
 const DiaryItem: React.FC<DiaryItemProps> = ({ diary, onEdit, onDelete, onView }) => {
   return (
     <div 

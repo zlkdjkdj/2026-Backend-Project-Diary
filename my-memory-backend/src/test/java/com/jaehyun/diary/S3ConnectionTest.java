@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+@SuppressWarnings("null")
 public class S3ConnectionTest {
 
     @Autowired

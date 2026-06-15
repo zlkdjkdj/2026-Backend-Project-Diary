@@ -2,29 +2,24 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/authApi';
 
-// 신규 사용자 등록 회원가입 페이지 컴포넌트
-// 자격 증명 검증 및 백엔드 API 계정 프로비저닝 요청
-// return: 회원가입 폼 렌더링 JSX 요소
+// 회원가입 페이지 컴포넌트
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   
-  // 회원가입 폼 입력 필드 및 뷰 상태 관리
+  // 상태 관리
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // 성공/오류 상태 일시적 알림 노출
-  // param: 출력 알림 메시지 내용
-  // param: 알림 유형 ('success' | 'error')
+  // 알림 메시지 설정
   const showAlert = (text: string, type: 'success' | 'error' = 'success') => {
     setAlertMessage({ type, text });
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // 회원가입 폼 제출 이벤트 비동기 핸들러
-  // 유효성 검사 및 사용자 생성 요청 (성공 시 로그인 전환)
+  // 회원가입 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim() || !nickname.trim()) {
