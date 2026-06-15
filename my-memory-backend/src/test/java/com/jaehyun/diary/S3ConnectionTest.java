@@ -24,6 +24,12 @@ public class S3ConnectionTest {
     @Autowired
     private com.jaehyun.diary.service.FileService fileService;
 
+    @Autowired
+    private com.jaehyun.diary.service.AuthService authService;
+
+    @Autowired
+    private com.jaehyun.diary.repository.UserRepository userRepository;
+
     @Test
     public void testS3Connection() {
         System.out.println("S3 연결 테스트 시작...");
@@ -108,6 +114,69 @@ public class S3ConnectionTest {
             System.out.println("POST API 호출 성공!");
         } catch (Exception e) {
             System.err.println("POST API 호출 실패!");
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Test
+    public void testFullTokenFlow() throws Exception {
+        System.out.println("전체 토큰 흐름 테스트 시작...");
+        String testEmail = "tokenflow@example.com";
+        String testPassword = "password123";
+        String nickname = "테스터";
+
+        try {
+            // 1. 기존 유저 정리
+            userRepository.findByUserEmail(testEmail).ifPresent(u -> userRepository.delete(u));
+
+            // 2. 회원가입
+            com.jaehyun.diary.dto.AuthForm.RegisterForm regForm = new com.jaehyun.diary.dto.AuthForm.RegisterForm();
+            regForm.setUserEmail(testEmail);
+            regForm.setRawPassword(testPassword);
+            regForm.setUserNickname(nickname);
+            authService.register(regForm);
+            System.out.println("1. 회원가입 완료");
+
+            // 3. 로그인 및 토큰 발급
+            com.jaehyun.diary.dto.AuthForm.LoginForm loginForm = new com.jaehyun.diary.dto.AuthForm.LoginForm();
+            loginForm.setUserEmail(testEmail);
+            loginForm.setRawPassword(testPassword);
+            com.jaehyun.diary.dto.AuthForm.TokenResponse tokenRes = authService.login(loginForm);
+            String token = tokenRes.getAccessToken();
+            System.out.println("2. 로그인 성공, 토큰 획득: " + token);
+
+            // 4. JWT 토큰을 실어 일기 작성 API 호출 (이미지 첨부 포함)
+            String diaryJson = "{\"diaryTitle\":\"토큰 테스트 제목\",\"diaryContent\":\"토큰 테스트 내용\",\"writtenDate\":\"2026-06-15\"}";
+            org.springframework.mock.web.MockMultipartFile diaryPart = new org.springframework.mock.web.MockMultipartFile(
+                    "diary",
+                    "",
+                    "application/json",
+                    diaryJson.getBytes()
+            );
+
+            org.springframework.mock.web.MockMultipartFile imagePart = new org.springframework.mock.web.MockMultipartFile(
+                    "image",
+                    "upload-test.png",
+                    "image/png",
+                    "fake image data".getBytes()
+            );
+
+            mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/api/diary")
+                    .file(diaryPart)
+                    .file(imagePart)
+                    .header("Authorization", "Bearer " + token))
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
+            System.out.println("3. JWT 인증 기반 일기 작성 및 S3 업로드 API 성공!");
+
+            // 5. 일기 목록 조회
+            mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/diary")
+                    .header("Authorization", "Bearer " + token))
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
+            System.out.println("4. JWT 인증 기반 일기 목록 조회 API 성공!");
+
+        } catch (Exception e) {
+            System.err.println("전체 토큰 흐름 테스트 실패!");
             e.printStackTrace();
             throw e;
         }
