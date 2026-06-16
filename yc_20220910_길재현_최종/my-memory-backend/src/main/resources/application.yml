@@ -1,0 +1,15 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8089
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 1800000 # 30분 (밀리초 단위)

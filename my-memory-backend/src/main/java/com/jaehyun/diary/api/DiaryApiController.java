@@ -11,10 +11,9 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
-// 일기 API 컨트롤러
+// 일기 API
 @RestController
 @RequestMapping("/api/diary")
-@CrossOrigin(origins = "*")
 public class DiaryApiController {
 
     @Autowired
@@ -23,35 +22,36 @@ public class DiaryApiController {
     @Autowired
     private FileService fileService;
 
-    // 일기 생성
+    // 생성 처리
     @PostMapping
     public DiaryForm createDiary(
             Principal principal,
             @RequestPart("diary") DiaryForm diaryInputData,
             @RequestPart(value = "image", required = false) MultipartFile diaryImageFile) throws IOException {
 
-        // 첨부 이미지가 있을 경우 S3에 저장 후 URL을 DTO에 매핑
-        if (diaryImageFile != null && !diaryImageFile.isEmpty()) {
-            String imageUrl = fileService.saveFile(diaryImageFile);
-            diaryInputData.setAttachedPhotoUrl(imageUrl);
+        // S3 이미지 업로드
+        if (diaryImageFile != null && !diaryImageFile.isEmpty()) { // 이미지 파일 존재 여부 확인, FileService를 통해 S3에 업로드하고 업로드된
+                                                                   // public URL을 가져옴
+            String imageUrl = fileService.saveFile(diaryImageFile); // 이미지 저장 매서드 호출
+            diaryInputData.setAttachedPhotoUrl(imageUrl); // 이미지 url 설정
         }
 
-        return diaryService.createDiary(principal.getName(), diaryInputData);
+        return diaryService.createDiary(principal.getName(), diaryInputData); // 서비스로 넘겨 db에 최종 저장
     }
 
-    // 일기 목록 조회
+    // 목록 조회 처리
     @GetMapping
     public List<DiaryForm> getAllDiaries(Principal principal) {
         return diaryService.getAllDiaries(principal.getName());
     }
 
-    // 일기 검색
+    // 검색 처리
     @GetMapping("/search")
     public List<DiaryForm> searchDiaries(Principal principal, @RequestParam("keyword") String searchKeyword) {
         return diaryService.searchDiaries(principal.getName(), searchKeyword);
     }
 
-    // 일기 수정
+    // 수정 처리
     @PutMapping("/{id}")
     public DiaryForm updateDiary(
             Principal principal,
@@ -59,7 +59,7 @@ public class DiaryApiController {
             @RequestPart("diary") DiaryForm diaryInputData,
             @RequestPart(value = "image", required = false) MultipartFile diaryImageFile) throws IOException {
 
-        // 이미지 변경 시 새로운 이미지를 S3에 저장 후 URL 교체
+        // S3 이미지 교체
         if (diaryImageFile != null && !diaryImageFile.isEmpty()) {
             String imageUrl = fileService.saveFile(diaryImageFile);
             diaryInputData.setAttachedPhotoUrl(imageUrl);
@@ -68,9 +68,9 @@ public class DiaryApiController {
         return diaryService.updateDiary(principal.getName(), id, diaryInputData);
     }
 
-    // 일기 삭제
-    @DeleteMapping("/{id}")
+    // 삭제 처리
+    @DeleteMapping("/{id}") // HTTP DELETE /api/diary/{id} 요청 매핑
     public void deleteDiary(Principal principal, @PathVariable("id") String id) {
-        diaryService.deleteDiary(principal.getName(), id);
+        diaryService.deleteDiary(principal.getName(), id); // 서비스로 보내서 db에서 삭제 처리
     }
 }
