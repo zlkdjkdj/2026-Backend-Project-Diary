@@ -99,28 +99,28 @@ const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           </div>
 
-          {/* 백업 및 복원 가이드 */}
+          {/* 클라우드 스토리지 연동 및 보안 가이드 */}
           <div className="bg-white dark:bg-neutral-900 border border-gray-200/60 dark:border-neutral-800/80 rounded-3xl p-6 space-y-4 shadow-xs">
             <h4 className="text-xs lg:text-sm font-bold text-gray-950 dark:text-white flex items-center gap-2">
-              📂 구글 드라이브 활용 백업 & 복원 가이드
+              ☁️ 실시간 클라우드 동기화 및 백업 가이드
             </h4>
             <div className="space-y-3.5 text-[11px] lg:text-xs text-gray-600 dark:text-neutral-300 leading-relaxed">
               <div className="flex gap-2.5">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-gray-900 dark:text-white font-bold flex items-center justify-center text-[10px]">1</span>
                 <p>
-                  <strong className="text-gray-900 dark:text-white font-semibold">데이터 백업:</strong> 로그인 후 메인 화면 상단의 <span className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono text-[10px] dark:text-white">백업</span> 버튼을 클릭하여 일기와 업로드했던 이미지 전체가 안전하게 압축된 <span className="underline decoration-blue-500 decoration-1">zip 백업 파일</span>을 다운로드합니다.
+                  <strong className="text-gray-900 dark:text-white font-semibold">데이터 실시간 저장:</strong> 작성한 모든 일기 데이터는 백엔드 서버를 거쳐 <span className="underline decoration-blue-500 decoration-1 text-gray-900 dark:text-white">MongoDB 클라우드</span> 데이터베이스에 즉시 안전하게 저장됩니다.
                 </p>
               </div>
               <div className="flex gap-2.5">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-gray-900 dark:text-white font-bold flex items-center justify-center text-[10px]">2</span>
                 <p>
-                  <strong className="text-gray-900 dark:text-white font-semibold">구글 드라이브 보관:</strong> 제공되는 구글 드라이브 이동 링크나 위젯을 활용해 다운로드한 zip 파일을 본인의 구글 드라이브 클라우드 공간에 업로드하여 이중으로 안전하게 보관합니다.
+                  <strong className="text-gray-900 dark:text-white font-semibold">대용량 미디어 격리 보관:</strong> 첨부한 사진 파일은 고화질 원본 그대로 <span className="underline decoration-blue-500 decoration-1 text-gray-900 dark:text-white">AWS S3 스토리지</span>에 업로드되며, 로컬 저장 용량 제한 없이 안전하게 영구 보존됩니다.
                 </p>
               </div>
               <div className="flex gap-2.5">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-gray-900 dark:text-white font-bold flex items-center justify-center text-[10px]">3</span>
                 <p>
-                  <strong className="text-gray-900 dark:text-white font-semibold">데이터 복원:</strong> 새 기기 접속이나 복구가 필요할 때, 메인 화면의 <span className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono text-[10px] dark:text-white">복원</span> 버튼을 누르고 구글 드라이브에 올렸던 zip 파일을 선택하면 기존 모든 데이터가 완벽히 되살아납니다.
+                  <strong className="text-gray-900 dark:text-white font-semibold">기기 간 실시간 연동:</strong> 회원 가입 후 로그인만 수행하면 PC, 태블릿, 모바일 등 어떤 기기에서든 동일한 데이터에 실시간으로 안전하게 동기화되어 접근할 수 있습니다.
                 </p>
               </div>
             </div>
