@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/authApi';
 
-// LoginPage Props 정의
+// 로그인 속성
 interface LoginPageProps {
   setToken: (token: string | null) => void;
   setCurrentUser: (user: { email: string; nickname: string } | null) => void;
 }
 
-// 로그인 페이지 컴포넌트
+// 로그인 페이지
 const LoginPage: React.FC<LoginPageProps> = ({
   setToken,
   setCurrentUser,
 }) => {
   const navigate = useNavigate();
-  
+
   // 상태 관리
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  // 에러 메시지 출력
+  // 알림 설정
   const showAlert = (msg: string) => {
     setAlertMessage(msg);
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // 로그인 요청 핸들러
+  // 폼 제출 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
@@ -37,6 +37,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
 
     setLoading(true);
     try {
+      //로그인 API 호출
       const response = await authApi.login({ userEmail: email, rawPassword: password });
       setToken(response.accessToken);
       setCurrentUser({ email: response.userEmail, nickname: response.userNickname });
@@ -62,7 +63,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
 
       {/* Main Container: Wide Layout */}
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center py-8 lg:py-12">
-        
+
         {/* Left Column: Service Introduction */}
         <div className="lg:col-span-7 space-y-6 animate-in fade-in slide-in-from-left-4 duration-500 text-left">
           <div className="space-y-3">
@@ -75,7 +76,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
             </h1>
             <p className="text-xs lg:text-sm text-gray-500 dark:text-neutral-400 leading-relaxed max-w-lg">
               기록은 삶의 흔적을 남기는 가장 아름다운 방법입니다.
-              My Memory는 직관적이고 세련된 디자인과 강력한 클라우드 이중 백업을 통해, 당신의 소중한 일상과 일기들이 유실 없이 안전하게 평생 보존될 수 있도록 돕습니다.
+              My Memory는 직관적인 디자인과 Spring Boot + MongoDB 기반의 고성능 서버 아키텍처, 그리고 AWS S3 클라우드 스토리지를 통해 당신의 소중한 일상과 일기들이 유실 없이 안전하게 평생 보존될 수 있도록 돕습니다.
             </p>
           </div>
 
@@ -83,18 +84,18 @@ const LoginPage: React.FC<LoginPageProps> = ({
           <div className="grid grid-cols-3 gap-3">
             <div className="p-4 bg-white dark:bg-neutral-900 border border-gray-200/50 dark:border-neutral-800 rounded-2xl shadow-xs">
               <span className="block text-xl mb-1.5">☁️</span>
-              <span className="block text-xs font-bold text-gray-900 dark:text-white">실시간 클라우드</span>
-              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">MongoDB Atlas 기반 실시간 자동 데이터 연동</span>
+              <span className="block text-xs font-bold text-gray-900 dark:text-white">Spring Boot & MongoDB</span>
+              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">NoSQL 연동을 통한 유연하고 빠른 데이터 관리</span>
             </div>
             <div className="p-4 bg-white dark:bg-neutral-900 border border-gray-200/50 dark:border-neutral-800 rounded-2xl shadow-xs">
-              <span className="block text-xl mb-1.5">💾</span>
-              <span className="block text-xs font-bold text-gray-900 dark:text-white">안전한 데이터 백업</span>
-              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">전체 일기와 사진을 압축 저장하여 완벽 보관</span>
+              <span className="block text-xl mb-1.5">🔒</span>
+              <span className="block text-xs font-bold text-gray-900 dark:text-white">JWT & Spring Security</span>
+              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">무상태 인증 체계 구축 및 철저한 API 접근 제어</span>
             </div>
             <div className="p-4 bg-white dark:bg-neutral-900 border border-gray-200/50 dark:border-neutral-800 rounded-2xl shadow-xs">
-              <span className="block text-xl mb-1.5">🌓</span>
-              <span className="block text-xs font-bold text-gray-900 dark:text-white">다크모드 지원</span>
-              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">야간에도 눈 피로가 적은 저자극 맞춤형 색감</span>
+              <span className="block text-xl mb-1.5">📁</span>
+              <span className="block text-xs font-bold text-gray-900 dark:text-white">AWS S3 Cloud</span>
+              <span className="block text-[9px] text-gray-400 dark:text-neutral-500 mt-1.5 leading-normal">S3 연동을 통한 대용량 이미지의 격리 보관 및 최적화</span>
             </div>
           </div>
 
@@ -132,7 +133,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
             <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-950 dark:text-white mb-8 text-center tracking-tight">
               로그인
             </h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-[11px] font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
